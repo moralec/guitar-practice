@@ -987,7 +987,7 @@ function renderBtGrid() {
       if (on && cls === 'snare-on') {
         const lbl = document.createElement('span');
         lbl.className = 'stroke-lbl';
-        lbl.textContent = i % 4 < 2 ? 'D' : 'U';
+        lbl.textContent = i % 2 === 0 ? 'D' : 'U';
         cell.appendChild(lbl);
       }
       cells.appendChild(cell);
