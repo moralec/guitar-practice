@@ -891,7 +891,14 @@ let shifter = null;
 let stModule = null;
 
 async function loadST() {
-  if (!stModule) stModule = await import('https://cdn.jsdelivr.net/gh/cutterbl/SoundTouchJS/dist/soundtouch.js');
+  if (!stModule) {
+    try {
+      stModule = await import('https://cdn.jsdelivr.net/gh/cutterbl/SoundTouchJS/dist/soundtouch.js');
+    } catch(e) {
+      console.warn('SoundTouchJS failed to load, falling back to direct playback');
+      return null;
+    }
+  }
   return stModule;
 }
 
@@ -999,10 +1006,9 @@ function seekTo(e) {
 async function startSrc() {
   if (pitchSemitones !== 0) {
     const mod = await loadST();
-    startSrcWithPitch(mod.PitchShifter);
-  } else {
-    startSrcDirect();
+    if (mod) { startSrcWithPitch(mod.PitchShifter); return; }
   }
+  startSrcDirect();
 }
 
 function startSrcDirect() {
