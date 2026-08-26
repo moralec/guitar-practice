@@ -213,6 +213,16 @@
   .bt-step.current  { box-shadow: 0 0 0 2px #fff; filter: brightness(1.3); }
   .bt-beat-lbl { flex: 1; text-align: center; font-size: 9px; color: #2a2a2a; font-weight: 600; padding-top: 2px; }
   .bt-sep { width: 1px; background: #2a2a2a; align-self: stretch; flex-shrink: 0; }
+
+  /* Chord section */
+  .chord-structure { border: 1px solid #1e1e1e; border-radius: 8px; overflow: hidden; margin-top: 20px; margin-bottom: 14px; }
+  .chord-prog-row { display: flex; align-items: center; gap: 14px; padding: 9px 14px; background: #141414; border-bottom: 1px solid #1e1e1e; }
+  .chord-prog-row:last-child { border-bottom: none; }
+  .section-name { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #555; min-width: 72px; flex-shrink: 0; }
+  .chord-pills { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
+  .chord-pill { font-size: 12px; font-weight: 700; color: #f5a623; }
+  .chord-arrow { font-size: 10px; color: #2a2a2a; padding: 0 1px; }
+  .chord-diagrams { display: flex; gap: 10px; flex-wrap: wrap; }
 </style>
 </head>
 <body>
@@ -251,13 +261,7 @@
       <div class="step-label">Warmup · 5 min</div>
       <div class="step-title" id="warmupTitle">Pentatonic Scale</div>
       <div class="step-meta" id="warmupMeta"></div>
-      <a class="yt-thumb" id="warmupThumb" href="#" target="_blank">
-        <img id="warmupImg" src="" alt="Warmup video">
-        <div class="yt-overlay">
-          <div class="yt-play-circle">▶</div>
-          <span class="yt-label" id="warmupLabel">Watch on YouTube</span>
-        </div>
-      </a>
+      <a class="yt-thumb" id="warmupThumb" href="#" target="_blank"></a>
     </div>
   </div>
 
@@ -268,14 +272,9 @@
       <div class="step-label">Full Song Lesson · ~10 min</div>
       <div class="step-title" id="lessonTitle">Full Song Lesson</div>
       <div class="step-meta">Watch once to understand the structure, then play along section by section</div>
-      <a class="yt-thumb" id="lessonThumb" href="#" target="_blank">
-        <img id="lessonImg" src="" alt="Lesson video">
-        <div class="yt-overlay">
-          <div class="yt-play-circle">▶</div>
-          <span class="yt-label" id="lessonLabel">Marty Music · YouTube</span>
-        </div>
-      </a>
+      <a class="yt-thumb" id="lessonThumb" href="#" target="_blank"></a>
       <div class="links-row" id="tabLinks"></div>
+      <div id="chordSection"></div>
     </div>
   </div>
 
@@ -365,6 +364,36 @@
 </div><!-- #stepsSection -->
 
 <script>
+// ── Chord shape library ────────────────────────────────
+// frets: [lowE, A, D, G, B, highE] — -1=muted, 0=open, N=fret
+// barre: fret number of full barre (omit if no barre)
+const CHORD_SHAPES = {
+  "G":     { frets: [3,2,0,0,0,3] },
+  "D":     { frets: [-1,-1,0,2,3,2] },
+  "C":     { frets: [-1,3,2,0,1,0] },
+  "Em":    { frets: [0,2,2,0,0,0] },
+  "Em7":   { frets: [0,2,2,0,3,0] },
+  "Am":    { frets: [-1,0,2,2,1,0] },
+  "Am7":   { frets: [-1,0,2,0,1,0] },
+  "A":     { frets: [-1,0,2,2,2,0] },
+  "E":     { frets: [0,2,2,1,0,0] },
+  "B7":    { frets: [-1,2,1,2,0,2] },
+  "Cadd9": { frets: [-1,3,2,0,3,0] },
+  "Dsus4": { frets: [-1,-1,0,2,3,3] },
+  "D/F#":  { frets: [2,-1,0,2,3,2] },
+  "Bm":    { frets: [-1,2,4,4,3,2], barre: 2 },
+  "F#m":   { frets: [2,4,4,2,2,2],  barre: 2 },
+  "F#":    { frets: [2,4,4,3,2,2],  barre: 2 },
+  "C#m":   { frets: [-1,4,6,6,5,4], barre: 4 },
+  "B":     { frets: [-1,2,4,4,4,2], barre: 2 },
+  "F":     { frets: [1,3,3,2,1,1],  barre: 1 },
+  "Cm":    { frets: [-1,3,5,5,4,3], barre: 3 },
+  "Ab":    { frets: [4,6,6,5,4,4],  barre: 4 },
+  "Eb":    { frets: [-1,6,8,8,8,6], barre: 6 },
+  "Bb":    { frets: [-1,1,3,3,3,1], barre: 1 },
+  "Gm":    { frets: [3,5,5,3,3,3],  barre: 3 },
+};
+
 // ── Session data ───────────────────────────────────────
 const STUB = { kick: [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], snare: [1,0,0,0, 1,0,0,1, 0,1,0,0, 1,1,1,1] };
 
@@ -380,7 +409,12 @@ const TRACKS = {
         links: [
           { label: "🎸 Tab",    url: "https://tabs.ultimate-guitar.com/tab/poison/every-rose-has-its-thorn-tabs-36879" },
           { label: "🎵 Chords", url: "https://tabs.ultimate-guitar.com/tab/poison/every-rose-has-its-thorn-official-1956067" },
-        ]
+        ],
+        chords: { structure: [
+          { label: "Intro",  prog: ["G","D","C"] },
+          { label: "Verse",  prog: ["G","D","C"] },
+          { label: "Chorus", prog: ["G","D","Em","C"] },
+        ]}
       },
       2: {
         title: "Knockin' on Heaven's Door", artist: "Guns N' Roses", year: 1990, bpm: 72, key: "G major",
@@ -390,7 +424,11 @@ const TRACKS = {
         links: [
           { label: "🎸 Tab",    url: "https://tabs.ultimate-guitar.com/tab/guns-n-roses/knockin-on-heavens-door-tabs-63863" },
           { label: "🎵 Chords", url: "https://tabs.ultimate-guitar.com/tab/guns-n-roses/knockin-on-heavens-door-chords-1417585" },
-        ]
+        ],
+        chords: { structure: [
+          { label: "Verse 1", prog: ["G","D","Am"] },
+          { label: "Verse 2", prog: ["G","D","C"] },
+        ]}
       },
       3: { title: "Smoke on the Water", artist: "Deep Purple", year: 1972, bpm: 112, key: "G minor", coming: true, backing: STUB },
       4: { title: "With or Without You", artist: "U2", year: 1987, bpm: 80, key: "D major", coming: true, backing: STUB },
@@ -403,7 +441,11 @@ const TRACKS = {
         links: [
           { label: "🎸 Tab",    url: "https://tabs.ultimate-guitar.com/tab/bryan-adams/summer-of-69-tabs-9826" },
           { label: "🎵 Chords", url: "https://tabs.ultimate-guitar.com/tab/bryan-adams/summer-of-69-chords-1503" },
-        ]
+        ],
+        chords: { structure: [
+          { label: "Verse",  prog: ["A","D"] },
+          { label: "Chorus", prog: ["G","D","A"] },
+        ]}
       },
       7: { title: "Here I Go Again", artist: "Whitesnake", year: 1987, bpm: 86, key: "C major", coming: true, backing: STUB },
       8: { title: "Wonderwall", artist: "Oasis", year: 1995, bpm: 87, key: "F# minor", coming: true, backing: STUB },
@@ -416,7 +458,11 @@ const TRACKS = {
         links: [
           { label: "🎸 Tab",    url: "https://tabs.ultimate-guitar.com/tab/pink-floyd/wish-you-were-here-tabs-8622" },
           { label: "🎵 Chords", url: "https://tabs.ultimate-guitar.com/tab/pink-floyd/wish-you-were-here-chords-44555" },
-        ]
+        ],
+        chords: { structure: [
+          { label: "Intro", prog: ["Em7","G"] },
+          { label: "Verse", prog: ["C","D","Am","G"] },
+        ]}
       },
     }
   },
@@ -434,7 +480,10 @@ const TRACKS = {
         links: [
           { label: "🎸 Tab",    url: "https://tabs.ultimate-guitar.com/tab/bon-jovi/you-give-love-a-bad-name-tabs-198860" },
           { label: "🎵 Chords", url: "https://tabs.ultimate-guitar.com/tab/bon-jovi/you-give-love-a-bad-name-chords-1242523" },
-        ]
+        ],
+        chords: { structure: [
+          { label: "Verse / Chorus", prog: ["Cm","Ab","Eb","Bb"] },
+        ]}
       },
       4: { title: "Enter Sandman", artist: "Metallica", year: 1991, bpm: 123, key: "E minor", coming: true, backing: STUB },
       5: {
@@ -445,7 +494,11 @@ const TRACKS = {
         links: [
           { label: "🎸 Tab",    url: "https://tabs.ultimate-guitar.com/tab/extreme/more-than-words-tabs-51" },
           { label: "🎵 Chords", url: "https://tabs.ultimate-guitar.com/tab/extreme/more-than-words-chords-4724" },
-        ]
+        ],
+        chords: { structure: [
+          { label: "Verse",  prog: ["G","Cadd9","Am7","C","D"] },
+          { label: "Chorus", prog: ["Em","D","G"] },
+        ]}
       },
       6: {
         title: "Money for Nothing", artist: "Dire Straits", year: 1985, bpm: 136, key: "G minor",
@@ -456,7 +509,10 @@ const TRACKS = {
           { label: "🎸 Tab",      url: "https://tabs.ultimate-guitar.com/tab/dire-straits/money-for-nothing-tabs-66374" },
           { label: "🎵 Chords",   url: "https://tabs.ultimate-guitar.com/tab/dire-straits/money-for-nothing-chords-1492334" },
           { label: "🎸 Intro Riff", url: "https://www.songsterr.com/a/wsa/dire-straits-money-for-nothing-intro-riff-tab-s1193885" },
-        ]
+        ],
+        chords: { structure: [
+          { label: "Verse",  prog: ["Gm","Bb","C"] },
+        ]}
       },
       7: { title: "Nothing Else Matters", artist: "Metallica", year: 1991, bpm: 69, key: "E minor", coming: true, backing: STUB },
       8: { title: "Paradise City", artist: "Guns N' Roses", year: 1987, bpm: 100, key: "G major", coming: true, backing: STUB },
@@ -468,7 +524,10 @@ const TRACKS = {
         links: [
           { label: "🎸 Tab",    url: "https://tabs.ultimate-guitar.com/tab/the-police/message-in-a-bottle-chords-1744532" },
           { label: "🎵 Chords", url: "https://tabs.ultimate-guitar.com/tab/the-police/message-in-a-bottle-chords-1091383" },
-        ]
+        ],
+        chords: { structure: [
+          { label: "Verse", prog: ["C#m","A","B"] },
+        ]}
       },
       10: {
         title: "Tears in Heaven", artist: "Eric Clapton", year: 1992, bpm: 80, key: "A major",
@@ -478,7 +537,11 @@ const TRACKS = {
         links: [
           { label: "🎸 Tab",    url: "https://tabs.ultimate-guitar.com/tab/eric-clapton/tears-in-heaven-tabs-3576" },
           { label: "🎵 Chords", url: "https://tabs.ultimate-guitar.com/tab/eric-clapton/tears-in-heaven-chords-44568" },
-        ]
+        ],
+        chords: { structure: [
+          { label: "Verse",  prog: ["A","E","F#m","D"] },
+          { label: "Chorus", prog: ["F#m","D","E","A"] },
+        ]}
       },
     }
   },
@@ -499,7 +562,11 @@ const TRACKS = {
         links: [
           { label: "🎸 Tab",    url: "https://tabs.ultimate-guitar.com/tab/eagles/hotel-california-tabs-46765" },
           { label: "🎵 Chords", url: "https://tabs.ultimate-guitar.com/tab/eagles/hotel-california-chords-988" },
-        ]
+        ],
+        chords: { structure: [
+          { label: "Verse",  prog: ["Bm","F#","A","E","G","D","Em","F#"] },
+          { label: "Chorus", prog: ["G","D","F#","Bm"] },
+        ]}
       },
       7: { title: "Blackbird", artist: "The Beatles", year: 1968, bpm: 96, key: "G major", coming: true, backing: STUB },
       8: { title: "Comfortably Numb", artist: "Pink Floyd", year: 1979, bpm: 63, key: "Bb major", coming: true, backing: STUB },
@@ -584,6 +651,92 @@ function setWeek(w) {
   resetPlayer();
 }
 
+// ── YouTube embed helper ───────────────────────────────
+function setThumb(elId, videoId, label) {
+  const el = document.getElementById(elId);
+  el.href = 'https://www.youtube.com/watch?v=' + videoId;
+  el.innerHTML =
+    `<img src="https://img.youtube.com/vi/${videoId}/hqdefault.jpg" alt="" style="width:100%;height:100%;object-fit:cover;display:block;">` +
+    `<div class="yt-overlay"><div class="yt-play-circle">▶</div><span class="yt-label">${label}</span></div>`;
+  el.onclick = function(e) {
+    e.preventDefault();
+    this.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0"
+      allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen
+      style="position:absolute;inset:0;width:100%;height:100%;border:0;border-radius:9px;"></iframe>`;
+    this.onclick = null;
+  };
+}
+
+// ── Chord diagram SVG ──────────────────────────────────
+function buildChordSVG(name, data) {
+  const frets = data.frets, barre = data.barre || 0;
+  const W = 56, H = 84, pl = 9, pr = 9, pt = 20, pb = 16;
+  const gw = W - pl - pr, gh = H - pt - pb;
+  const sw = gw / 5, fh = gh / 4;
+  const used = frets.filter(f => f > 0);
+  const maxF = used.length ? Math.max(...used) : 0;
+  const minF = used.length ? Math.min(...used) : 1;
+  const base = maxF > 4 ? minF : 1;
+  let s = '';
+  for (let f = 0; f <= 4; f++) {
+    const y = pt + f * fh;
+    s += `<line x1="${pl}" y1="${y}" x2="${pl+gw}" y2="${y}" stroke="${f===0&&base===1?'#888':'#2a2a2a'}" stroke-width="${f===0&&base===1?2.5:1}"/>`;
+  }
+  for (let i = 0; i < 6; i++) {
+    const x = pl + i * sw;
+    s += `<line x1="${x}" y1="${pt}" x2="${x}" y2="${pt+gh}" stroke="#2a2a2a" stroke-width="1"/>`;
+  }
+  if (barre > 0) {
+    const df = barre - base + 1;
+    if (df >= 1 && df <= 4) {
+      let l = 5, r = 0;
+      frets.forEach((f, i) => { if (f !== -1 && f >= barre) { l = Math.min(l,i); r = Math.max(r,i); } });
+      const y = pt + (df - 0.5) * fh;
+      s += `<rect x="${pl+l*sw}" y="${y-5.5}" width="${(r-l)*sw}" height="11" rx="5.5" fill="#f5a623"/>`;
+    }
+  }
+  frets.forEach((fret, i) => {
+    const x = pl + i * sw;
+    if (fret === -1) {
+      s += `<text x="${x}" y="${pt-6}" text-anchor="middle" font-size="10" fill="#3a3a3a" font-family="sans-serif">✕</text>`;
+    } else if (fret === 0) {
+      s += `<circle cx="${x}" cy="${pt-9}" r="3.5" fill="none" stroke="#555" stroke-width="1.5"/>`;
+    } else {
+      const df = fret - base + 1;
+      if (df >= 1 && df <= 4 && fret !== barre) {
+        const y = pt + (df - 0.5) * fh;
+        s += `<circle cx="${x}" cy="${y}" r="5.5" fill="#f5a623"/>`;
+      }
+    }
+  });
+  if (base > 1)
+    s += `<text x="${W-1}" y="${pt+fh*0.75}" text-anchor="end" font-size="8" fill="#555" font-family="sans-serif">${base}fr</text>`;
+  s += `<text x="${W/2}" y="${H-2}" text-anchor="middle" font-size="11" font-weight="700" fill="#ccc" font-family="Helvetica Neue,sans-serif">${name}</text>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">${s}</svg>`;
+}
+
+// ── Chord section renderer ─────────────────────────────
+function renderChordSection(s) {
+  const el = document.getElementById('chordSection');
+  if (!s.chords) { el.innerHTML = ''; return; }
+  const { structure } = s.chords;
+  const seen = new Set(), unique = [];
+  structure.forEach(row => row.prog.forEach(c => { if (!seen.has(c)) { seen.add(c); unique.push(c); } }));
+  const structHTML = '<div class="chord-structure">' +
+    structure.map(row =>
+      `<div class="chord-prog-row"><span class="section-name">${row.label}</span>` +
+      `<div class="chord-pills">${row.prog.map((c,i) =>
+        `<span class="chord-pill">${c}</span>${i < row.prog.length-1 ? '<span class="chord-arrow">→</span>' : ''}`
+      ).join('')}</div></div>`
+    ).join('') + '</div>';
+  const diagramsHTML = '<div class="chord-diagrams">' +
+    unique.map(name => {
+      const shape = CHORD_SHAPES[name];
+      return shape ? buildChordSVG(name, shape) : '';
+    }).join('') + '</div>';
+  el.innerHTML = structHTML + diagramsHTML;
+}
+
 // ── Session rendering ──────────────────────────────────
 function renderSession(s) {
   document.getElementById('hLabel').textContent  = TRACKS[currentTrack].label + ' · Week ' + currentWeek;
@@ -597,22 +750,16 @@ function renderSession(s) {
   document.getElementById('comingSoon').style.display   = coming ? 'flex' : 'none';
 
   if (!coming) {
-    const wId = s.warmup.videoId;
     document.getElementById('warmupTitle').textContent = s.warmup.title;
     document.getElementById('warmupMeta').textContent  = s.warmup.meta;
-    document.getElementById('warmupThumb').href = 'https://www.youtube.com/watch?v=' + wId;
-    document.getElementById('warmupImg').src    = 'https://img.youtube.com/vi/' + wId + '/hqdefault.jpg';
-    document.getElementById('warmupLabel').textContent = s.warmup.label;
-
-    const lId = s.lesson.videoId;
-    document.getElementById('lessonThumb').href = 'https://www.youtube.com/watch?v=' + lId;
-    document.getElementById('lessonImg').src    = 'https://img.youtube.com/vi/' + lId + '/hqdefault.jpg';
-    document.getElementById('lessonLabel').textContent = s.lesson.label || 'Marty Music · YouTube';
+    setThumb('warmupThumb', s.warmup.videoId, s.warmup.label);
+    setThumb('lessonThumb', s.lesson.videoId, s.lesson.label || 'Marty Music · YouTube');
 
     document.getElementById('tabLinks').innerHTML = s.links.map(l =>
       `<a href="${l.url}" target="_blank" class="link-pill">${l.label}</a>`
     ).join('');
 
+    renderChordSection(s);
     document.getElementById('playerSongName').textContent = s.title + ' — ' + s.artist;
   }
 }
