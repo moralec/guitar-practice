@@ -315,8 +315,6 @@
       <div class="step-meta">Learn the shapes · play through each section using the pattern above</div>
       <div class="card">
         <div id="chordDiagrams"></div>
-        <div class="chord-divider" id="diagDivider" style="display:none"></div>
-        <div id="chordGrid"></div>
       </div>
     </div>
   </div>
@@ -329,6 +327,7 @@
       <div class="step-title">Play Along</div>
       <div class="step-meta">Load the song from your library. Loop a section or play through in full.</div>
 
+      <div id="chordGrid" style="margin-bottom:16px"></div>
       <div class="card">
         <div class="card-title"><span class="status-dot" id="dot"></span><span id="playerSongName">Load a song to begin</span></div>
         <div class="card-sub" id="playerHint">Locate the file in your iTunes / Music library</div>
@@ -797,11 +796,9 @@ const CHORD_PALETTE = ['#60a5fa','#4ade80','#f87171','#fbbf24','#c084fc','#34d39
 function renderChordSection(s) {
   const diagEl = document.getElementById('chordDiagrams');
   const gridEl = document.getElementById('chordGrid');
-  const diagDiv = document.getElementById('diagDivider');
 
   if (!s.chords) {
     diagEl.innerHTML = ''; gridEl.innerHTML = '';
-    diagDiv.style.display = 'none';
     return;
   }
   const data = s.chords;
@@ -823,7 +820,6 @@ function renderChordSection(s) {
     return shape ? buildChordSVG(name, shape) : '';
   }).join('');
   diagEl.innerHTML = `<div class="chord-diagrams">${diagrams}</div>`;
-  diagDiv.style.display = '';
 
   // 2. Chord section grid (below the strumming pattern)
   let body = '';
