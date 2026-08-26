@@ -214,15 +214,17 @@
   .bt-beat-lbl { flex: 1; text-align: center; font-size: 9px; color: #2a2a2a; font-weight: 600; padding-top: 2px; }
   .bt-sep { width: 1px; background: #2a2a2a; align-self: stretch; flex-shrink: 0; }
 
-  /* Chord section */
-  .chord-structure { border: 1px solid #1e1e1e; border-radius: 8px; overflow: hidden; margin-top: 20px; margin-bottom: 14px; }
-  .chord-prog-row { display: flex; align-items: center; gap: 14px; padding: 9px 14px; background: #141414; border-bottom: 1px solid #1e1e1e; }
+  /* Chord section (lives inside the Practice card) */
+  #chordSection:not(:empty) { margin-bottom: 0; }
+  .chord-structure { margin-bottom: 4px; }
+  .chord-prog-row { display: flex; align-items: center; gap: 14px; padding: 7px 0; border-bottom: 1px solid #1e1e1e; }
   .chord-prog-row:last-child { border-bottom: none; }
   .section-name { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #555; min-width: 72px; flex-shrink: 0; }
   .chord-pills { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
   .chord-pill { font-size: 12px; font-weight: 700; color: #f5a623; }
   .chord-arrow { font-size: 10px; color: #2a2a2a; padding: 0 1px; }
-  .chord-diagrams { display: flex; gap: 10px; flex-wrap: wrap; }
+  .chord-divider { height: 1px; background: #1e1e1e; margin: 14px -22px 16px; }
+  .chord-diagrams { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
 </style>
 </head>
 <body>
@@ -274,7 +276,6 @@
       <div class="step-meta">Watch once to understand the structure, then play along section by section</div>
       <a class="yt-thumb" id="lessonThumb" href="#" target="_blank"></a>
       <div class="links-row" id="tabLinks"></div>
-      <div id="chordSection"></div>
     </div>
   </div>
 
@@ -286,6 +287,7 @@
       <div class="step-title">Backing Track</div>
       <div class="step-meta">Kick = pulse · snare = strumming pattern · play along until it's automatic</div>
       <div class="card">
+        <div id="chordSection"></div>
         <div class="bt-grid" id="btGrid"></div>
         <div class="ctrl-row" style="margin-top:14px">
           <button class="btn-play" id="btBtn" onclick="toggleBacking()">▶ Play</button>
@@ -411,9 +413,9 @@ const TRACKS = {
           { label: "🎵 Chords", url: "https://tabs.ultimate-guitar.com/tab/poison/every-rose-has-its-thorn-official-1956067" },
         ],
         chords: { structure: [
-          { label: "Intro",  prog: ["G","D","C"] },
-          { label: "Verse",  prog: ["G","D","C"] },
-          { label: "Chorus", prog: ["G","D","Em","C"] },
+          { label: "Intro",  prog: ["G","Cadd9","D"] },
+          { label: "Verse",  prog: ["G","Cadd9","D"] },
+          { label: "Chorus", prog: ["G","Cadd9","D","Em"] },
         ]}
       },
       2: {
@@ -734,7 +736,7 @@ function renderChordSection(s) {
       const shape = CHORD_SHAPES[name];
       return shape ? buildChordSVG(name, shape) : '';
     }).join('') + '</div>';
-  el.innerHTML = structHTML + diagramsHTML;
+  el.innerHTML = structHTML + diagramsHTML + '<div class="chord-divider"></div>';
 }
 
 // ── Session rendering ──────────────────────────────────
