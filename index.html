@@ -283,16 +283,14 @@
     </div>
   </div>
 
-  <!-- Step 3: Chords -->
+  <!-- Step 3: Strumming Pattern -->
   <div class="step">
     <div class="step-num">3</div>
     <div class="step-body">
-      <div class="step-label">Chords · 5 min</div>
-      <div class="step-title">Chords</div>
-      <div class="step-meta">Learn the shapes · practise the strumming pattern · play through each section</div>
+      <div class="step-label">Strumming Pattern · 5 min</div>
+      <div class="step-title">Strumming Pattern</div>
+      <div class="step-meta">Kick = pulse · snare = strumming pattern · lock in the rhythm before adding chords</div>
       <div class="card">
-        <div id="chordDiagrams"></div>
-        <div class="chord-divider" id="diagDivider" style="display:none"></div>
         <div class="bt-grid" id="btGrid"></div>
         <div class="ctrl-row" style="margin-top:14px">
           <button class="btn-play" id="btBtn" onclick="toggleBacking()">▶ Play</button>
@@ -303,15 +301,28 @@
             <span class="speed-val" id="btVolVal">75%</span>
           </div>
         </div>
-        <div class="chord-divider" id="gridDivider" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 4: Chords -->
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-body">
+      <div class="step-label">Chords · 5 min</div>
+      <div class="step-title">Chords</div>
+      <div class="step-meta">Learn the shapes · play through each section using the pattern above</div>
+      <div class="card">
+        <div id="chordDiagrams"></div>
+        <div class="chord-divider" id="diagDivider" style="display:none"></div>
         <div id="chordGrid"></div>
       </div>
     </div>
   </div>
 
-  <!-- Step 4: Play Along -->
+  <!-- Step 5: Play Along -->
   <div class="step">
-    <div class="step-num">4</div>
+    <div class="step-num">5</div>
     <div class="step-body">
       <div class="step-label">Play Along · 10 min</div>
       <div class="step-title">Play Along</div>
@@ -758,11 +769,10 @@ function renderChordSection(s) {
   const diagEl = document.getElementById('chordDiagrams');
   const gridEl = document.getElementById('chordGrid');
   const diagDiv = document.getElementById('diagDivider');
-  const gridDiv = document.getElementById('gridDivider');
 
   if (!s.chords) {
     diagEl.innerHTML = ''; gridEl.innerHTML = '';
-    diagDiv.style.display = 'none'; gridDiv.style.display = 'none';
+    diagDiv.style.display = 'none';
     return;
   }
   const data = s.chords;
@@ -816,7 +826,6 @@ function renderChordSection(s) {
       ).join('') + '</div>';
   }
   gridEl.innerHTML = body;
-  gridDiv.style.display = '';
 }
 
 // ── Session rendering ──────────────────────────────────
