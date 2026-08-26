@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guitar Practice</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0f0f0f; color: #e0e0e0;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    padding: 40px 20px 80px; max-width: 720px; margin: 0 auto;
+  }
+
+  /* Track selector */
+  .track-selector {
+    display: flex; gap: 4px; margin-bottom: 16px;
+    background: #141414; border: 1px solid #1e1e1e;
+    border-radius: 10px; padding: 4px;
+  }
+  .track-btn {
+    flex: 1; background: transparent; border: none; border-radius: 7px;
+    color: #555; font-size: 13px; font-weight: 600; padding: 10px;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .track-btn:hover { color: #aaa; }
+  .track-btn.active { background: #f5a623; color: #000; }
+
+  /* Week selector */
+  .week-selector {
+    display: flex; gap: 8px; margin-bottom: 40px; flex-wrap: wrap;
+  }
+  .week-btn {
+    background: #141414; border: 1px solid #2a2a2a; border-radius: 8px;
+    color: #555; font-size: 13px; font-weight: 600; padding: 8px 18px;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .week-btn:hover { border-color: #555; color: #aaa; }
+  .week-btn.active { background: #f5a623; border-color: #f5a623; color: #000; }
+  .week-btn.coming { opacity: 0.35; }
+  .week-btn.coming:hover { opacity: 0.55; border-color: #444; color: #888; }
+
+  /* Header */
+  header { margin-bottom: 48px; }
+  .song-label { font-size: 11px; text-transform: uppercase; letter-spacing: 3px; color: #f5a623; margin-bottom: 8px; }
+  header h1 { font-size: 32px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+  header .artist { margin-top: 4px; font-size: 15px; color: #666; }
+  .song-meta {
+    display: inline-flex; gap: 16px; margin-top: 14px;
+    background: #141414; border: 1px solid #222; border-radius: 8px;
+    padding: 10px 16px; font-size: 13px; color: #666;
+  }
+  .song-meta span strong { color: #f5a623; }
+
+  /* Coming soon */
+  #comingSoon {
+    display: none; flex-direction: column; align-items: center;
+    justify-content: center; padding: 80px 20px; gap: 14px;
+    border: 1px dashed #222; border-radius: 12px; margin-bottom: 48px;
+  }
+  .coming-icon { font-size: 44px; }
+  .coming-title { font-size: 17px; font-weight: 700; color: #555; }
+  .coming-sub { font-size: 13px; color: #333; text-align: center; line-height: 1.6; }
+
+  /* Steps */
+  .step { display: flex; gap: 24px; margin-bottom: 48px; position: relative; }
+  .step:not(:last-child)::after {
+    content: ''; position: absolute; left: 18px; top: 44px;
+    width: 2px; height: calc(100% + 8px); background: #1a1a1a;
+  }
+  .step-num {
+    flex-shrink: 0; width: 38px; height: 38px; border-radius: 50%;
+    background: #111; border: 2px solid #222;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; color: #f5a623; z-index: 1;
+  }
+  .step-body { flex: 1; padding-top: 6px; }
+  .step-label { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: #f5a623; margin-bottom: 4px; }
+  .step-title { font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+  .step-meta { font-size: 13px; color: #555; margin-bottom: 18px; }
+
+  /* YouTube thumbnail */
+  .yt-thumb {
+    display: block; position: relative; width: 100%; aspect-ratio: 16/9;
+    border-radius: 10px; overflow: hidden; border: 1px solid #1e1e1e;
+    margin-bottom: 14px; text-decoration: none; background: #000;
+  }
+  .yt-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .yt-overlay {
+    position: absolute; inset: 0; background: rgba(0,0,0,0.3);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 10px; transition: background 0.2s;
+  }
+  .yt-thumb:hover .yt-overlay { background: rgba(0,0,0,0.5); }
+  .yt-play-circle {
+    width: 64px; height: 64px; border-radius: 50%; background: #ff0000;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; color: #fff; transition: transform 0.15s;
+  }
+  .yt-thumb:hover .yt-play-circle { transform: scale(1.1); }
+  .yt-label { color: #fff; font-size: 13px; font-weight: 600; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
+
+  /* Links */
+  .links-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .link-pill {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: #141414; border: 1px solid #222; border-radius: 20px;
+    padding: 8px 16px; font-size: 13px; color: #888;
+    text-decoration: none; transition: border-color 0.2s, color 0.2s;
+  }
+  .link-pill:hover { border-color: #f5a623; color: #f5a623; }
+
+  /* Player card */
+  .card { background: #141414; border: 1px solid #222; border-radius: 10px; padding: 22px; }
+  .card-title { font-size: 13px; font-weight: 600; color: #666; margin-bottom: 3px; }
+  .card-sub { font-size: 12px; color: #333; margin-bottom: 16px; }
+
+  .load-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: transparent; border: 1px dashed #333; border-radius: 8px;
+    padding: 10px 16px; font-size: 13px; color: #555; cursor: pointer;
+    transition: border-color 0.2s, color 0.2s; margin-bottom: 0;
+  }
+  .load-btn:hover { border-color: #f5a623; color: #f5a623; }
+  .file-input { display: none; }
+
+  .player-body { display: none; margin-top: 16px; }
+  .player-body.loaded { display: block; }
+
+  /* Mode toggle */
+  .mode-row { display: flex; gap: 8px; margin-bottom: 16px; }
+  .mode-btn {
+    background: transparent; border: 1px solid #2a2a2a; border-radius: 8px;
+    color: #555; font-size: 13px; padding: 8px 16px; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .mode-btn.active { border-color: #f5a623; color: #f5a623; }
+
+  /* Waveform */
+  .waveform-bar {
+    background: #1a1a1a; border-radius: 6px; height: 44px;
+    position: relative; margin-bottom: 14px; overflow: hidden; cursor: pointer;
+  }
+  .waveform-bg { position: absolute; inset: 0; display: flex; align-items: center; gap: 1px; padding: 0 4px; }
+  .w-bar { flex: 1; background: #2a2a2a; border-radius: 1px; min-height: 4px; }
+  .waveform-region {
+    position: absolute; top: 0; bottom: 0;
+    background: rgba(245,166,35,0.12);
+    border-left: 2px solid #f5a623; border-right: 2px solid #f5a623;
+  }
+  .waveform-playhead { position: absolute; top: 0; bottom: 0; width: 2px; background: #fff; opacity: 0.5; pointer-events: none; }
+
+  /* Controls */
+  .ctrl-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+  .btn-play {
+    background: #f5a623; color: #000; border: none; border-radius: 8px;
+    padding: 10px 20px; font-size: 14px; font-weight: 700; cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-play:hover { background: #e09615; }
+  .btn-stop {
+    background: transparent; border: 1px solid #2a2a2a; color: #666;
+    border-radius: 8px; padding: 10px 14px; font-size: 13px; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-stop:hover { border-color: #555; color: #aaa; }
+  .time-disp { font-size: 12px; color: #444; margin-left: auto; font-variant-numeric: tabular-nums; }
+
+  /* Markers */
+  .marker-row { display: flex; gap: 12px; margin-bottom: 14px; align-items: center; flex-wrap: wrap; }
+  .marker-group { display: flex; align-items: center; gap: 8px; }
+  .marker-lbl { font-size: 12px; font-weight: 700; color: #f5a623; min-width: 16px; }
+  .marker-input {
+    background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 6px;
+    color: #e0e0e0; font-size: 13px; padding: 6px 10px; width: 72px;
+    font-variant-numeric: tabular-nums;
+  }
+  .marker-input:focus { outline: none; border-color: #f5a623; }
+  .set-btn {
+    background: transparent; border: 1px solid #222; border-radius: 6px;
+    color: #444; font-size: 11px; padding: 5px 9px; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .set-btn:hover { border-color: #f5a623; color: #f5a623; }
+
+  /* Speed */
+  .speed-row { display: flex; align-items: center; gap: 12px; font-size: 13px; color: #555; }
+  input[type=range] { flex: 1; accent-color: #f5a623; cursor: pointer; }
+  .speed-val { color: #f5a623; font-weight: 700; min-width: 70px; }
+
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: #333;
+    display: inline-block; margin-right: 6px; transition: background 0.3s;
+  }
+  .status-dot.on { background: #2d9c5c; }
+
+  #loopSection { display: block; }
+
+  /* Backing track step grid */
+  .bt-grid { display: flex; flex-direction: column; gap: 8px; }
+  .bt-row { display: flex; align-items: center; gap: 10px; }
+  .bt-label { font-size: 10px; font-weight: 700; color: #444; text-transform: uppercase; letter-spacing: 1px; min-width: 44px; }
+  .bt-cells { display: flex; gap: 3px; flex: 1; }
+  .bt-step {
+    flex: 1; height: 30px; border-radius: 4px;
+    background: #1a1a1a; border: 1px solid #222;
+    transition: box-shadow 0.05s;
+  }
+  .bt-step.kick-on  { background: rgba(245,166,35,0.7);  border-color: #f5a623; }
+  .bt-step.snare-on { background: rgba(45,156,92,0.7);   border-color: #2d9c5c; }
+  .bt-step.current  { box-shadow: 0 0 0 2px #fff; filter: brightness(1.3); }
+  .bt-beat-lbl { flex: 1; text-align: center; font-size: 9px; color: #2a2a2a; font-weight: 600; padding-top: 2px; }
+  .bt-sep { width: 1px; background: #2a2a2a; align-self: stretch; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<!-- ── Track selector ── -->
+<div class="track-selector" id="trackSelector"></div>
+
+<!-- ── Week selector ── -->
+<div class="week-selector" id="weekSelector"></div>
+
+<!-- ── Header ── -->
+<header>
+  <div class="song-label" id="hLabel">Beginner · Week 1</div>
+  <h1 id="hTitle"></h1>
+  <div class="artist" id="hArtist"></div>
+  <div class="song-meta">
+    <span><strong id="hBpm"></strong> BPM</span>
+    <span>Key: <strong id="hKey"></strong></span>
+  </div>
+</header>
+
+<!-- ── Coming soon ── -->
+<div id="comingSoon">
+  <div class="coming-icon">🎸</div>
+  <div class="coming-title">Session coming soon</div>
+  <div class="coming-sub">This week is being prepared.<br>Keep practicing — sessions are added in order.</div>
+</div>
+
+<!-- ── Steps (hidden when coming soon) ── -->
+<div id="stepsSection">
+
+  <!-- Step 1: Warmup -->
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-body">
+      <div class="step-label">Warmup · 5 min</div>
+      <div class="step-title" id="warmupTitle">Pentatonic Scale</div>
+      <div class="step-meta" id="warmupMeta"></div>
+      <a class="yt-thumb" id="warmupThumb" href="#" target="_blank">
+        <img id="warmupImg" src="" alt="Warmup video">
+        <div class="yt-overlay">
+          <div class="yt-play-circle">▶</div>
+          <span class="yt-label" id="warmupLabel">Watch on YouTube</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Step 2: Full Song Lesson -->
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-body">
+      <div class="step-label">Full Song Lesson · ~10 min</div>
+      <div class="step-title" id="lessonTitle">Full Song Lesson</div>
+      <div class="step-meta">Watch once to understand the structure, then play along section by section</div>
+      <a class="yt-thumb" id="lessonThumb" href="#" target="_blank">
+        <img id="lessonImg" src="" alt="Lesson video">
+        <div class="yt-overlay">
+          <div class="yt-play-circle">▶</div>
+          <span class="yt-label" id="lessonLabel">Marty Music · YouTube</span>
+        </div>
+      </a>
+      <div class="links-row" id="tabLinks"></div>
+    </div>
+  </div>
+
+  <!-- Step 3: Backing Track -->
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-body">
+      <div class="step-label">Practice · 5 min</div>
+      <div class="step-title">Backing Track</div>
+      <div class="step-meta">Kick = pulse · snare = strumming pattern · play along until it's automatic</div>
+      <div class="card">
+        <div class="bt-grid" id="btGrid"></div>
+        <div class="ctrl-row" style="margin-top:14px">
+          <button class="btn-play" id="btBtn" onclick="toggleBacking()">▶ Play</button>
+          <button class="btn-stop" onclick="stopBacking()">■ Stop</button>
+          <div class="speed-row" style="flex:1;margin-left:12px">
+            <span>Volume</span>
+            <input type="range" id="btVol" min="0" max="100" value="75" oninput="document.getElementById('btVolVal').textContent=this.value+'%'">
+            <span class="speed-val" id="btVolVal">75%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 4: Play Along -->
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-body">
+      <div class="step-label">Play Along · 10 min</div>
+      <div class="step-title">Play Along</div>
+      <div class="step-meta">Load the song from your library. Loop a section or play through in full.</div>
+
+      <div class="card">
+        <div class="card-title"><span class="status-dot" id="dot"></span><span id="playerSongName">Load a song to begin</span></div>
+        <div class="card-sub" id="playerHint">Locate the file in your iTunes / Music library</div>
+        <button class="load-btn" onclick="document.getElementById('fileInput').click()">📂 Load song</button>
+        <input type="file" id="fileInput" class="file-input" accept="audio/*" onchange="loadFile(event)">
+
+        <div class="player-body" id="playerBody">
+          <div class="mode-row">
+            <button class="mode-btn active" id="modeLoopBtn" onclick="setMode('loop')">↺ Loop section</button>
+            <button class="mode-btn" id="modeFullBtn" onclick="setMode('full')">▶ Full song</button>
+          </div>
+
+          <div class="waveform-bar" id="waveformBar" onclick="seekTo(event)">
+            <div class="waveform-bg" id="waveformBg"></div>
+            <div class="waveform-region" id="waveformRegion"></div>
+            <div class="waveform-playhead" id="playhead"></div>
+          </div>
+
+          <div class="ctrl-row">
+            <button class="btn-play" id="playBtn" onclick="togglePlay()">▶ Play</button>
+            <button class="btn-stop" onclick="stopAndReset()">■ Stop</button>
+            <span class="time-disp" id="timeDisp">0:00 / 0:00</span>
+          </div>
+
+          <div id="loopSection">
+            <div class="marker-row">
+              <div class="marker-group">
+                <span class="marker-lbl">A</span>
+                <input class="marker-input" id="markerA" type="text" value="0:00" onchange="updateRegion()">
+                <button class="set-btn" onclick="setMarkerNow('A')">Set now</button>
+              </div>
+              <div class="marker-group">
+                <span class="marker-lbl">B</span>
+                <input class="marker-input" id="markerB" type="text" value="0:00" onchange="updateRegion()">
+                <button class="set-btn" onclick="setMarkerNow('B')">Set now</button>
+              </div>
+            </div>
+            <div class="speed-row">
+              <span>Speed</span>
+              <input type="range" id="speedSlider" min="40" max="100" value="100" oninput="onSpeedChange(this.value)">
+              <span class="speed-val" id="speedVal">100%</span>
+            </div>
+          </div>
+          <div class="speed-row" style="margin-top:10px;padding-top:12px;border-top:1px solid #1a1a1a">
+            <span>Key</span>
+            <input type="range" id="pitchSlider" min="-6" max="6" value="0" step="1" oninput="onPitchChange(+this.value)">
+            <span class="speed-val" id="pitchVal">Original</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- #stepsSection -->
+
+<script>
+// ── Session data ───────────────────────────────────────
+const STUB = { kick: [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], snare: [1,0,0,0, 1,0,0,1, 0,1,0,0, 1,1,1,1] };
+
+const TRACKS = {
+  beginner: {
+    label: 'Beginner',
+    sessions: {
+      1: {
+        title: "Every Rose Has Its Thorn", artist: "Poison", year: 1988, bpm: 88, key: "G major",
+        backing: { kick: [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], snare: [1,0,0,0, 1,0,0,1, 0,1,0,0, 1,1,1,1] },
+        warmup: { videoId: "BIsrKOXyi6U", label: "Pentatonic Scale · YouTube", title: "Pentatonic Scale", meta: "Foundation of every rock song · A minor box shape, 5th fret, slow and clean" },
+        lesson: { videoId: "oYpguG4KxdQ", label: "Marty Music · YouTube" },
+        links: [
+          { label: "🎸 Tab",    url: "https://tabs.ultimate-guitar.com/tab/poison/every-rose-has-its-thorn-tabs-36879" },
+          { label: "🎵 Chords", url: "https://tabs.ultimate-guitar.com/tab/poison/every-rose-has-its-thorn-official-1956067" },
+        ]
+      },
+      2: {
+        title: "Knockin' on Heaven's Door", artist: "Guns N' Roses", year: 1990, bpm: 72, key: "G major",
+        backing: { kick: [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], snare: [1,0,0,0, 1,0,0,1, 0,1,0,0, 1,1,1,1] },
+        warmup: { videoId: "CjM5fyXoV8w", label: "Strumming Patterns · YouTube", title: "Strumming Patterns", meta: "This song lives and dies on feel and rhythm · lock in your strum before you play a chord" },
+        lesson: { videoId: "mMnla7_Ipr4", label: "Marty Music · YouTube" },
+        links: [
+          { label: "🎸 Tab",    url: "https://tabs.ultimate-guitar.com/tab/guns-n-roses/knockin-on-heavens-door-tabs-63863" },
+          { label: "🎵 Chords", url: "https://tabs.ultimate-guitar.com/tab/guns-n-roses/knockin-on-heavens-door-chords-1417585" },
+        ]
+      },
+      3: { title: "Smoke on the Water", artist: "Deep Purple", year: 1972, bpm: 112, key: "G minor", coming: true, backing: STUB },
+      4: { title: "With or Without You", artist: "U2", year: 1987, bpm: 80, key: "D major", coming: true, backing: STUB },
+      5: { title: "Free Fallin'", artist: "Tom Petty", year: 1989, bpm: 85, key: "F major", coming: true, backing: STUB },
+      6: {
+        title: "Summer of '69", artist: "Bryan Adams", year: 1985, bpm: 144, key: "D major",
+        backing: { kick: [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], snare: [1,0,0,0, 1,0,0,1, 0,1,0,0, 1,1,1,1] },
+        warmup: { videoId: "vMt8T5Jqf10", label: "Strumming Exercise · YouTube", title: "Rhythm & Strumming", meta: "Summer of '69 is about driving energy · get the right hand loose before you hit those downstrokes" },
+        lesson: { videoId: "owPLZdGkNFs", label: "JustinGuitar · YouTube" },
+        links: [
+          { label: "🎸 Tab",    url: "https://tabs.ultimate-guitar.com/tab/bryan-adams/summer-of-69-tabs-9826" },
+          { label: "🎵 Chords", url: "https://tabs.ultimate-guitar.com/tab/bryan-adams/summer-of-69-chords-1503" },
+        ]
+      },
+      7: { title: "Here I Go Again", artist: "Whitesnake", year: 1987, bpm: 86, key: "C major", coming: true, backing: STUB },
+      8: { title: "Wonderwall", artist: "Oasis", year: 1995, bpm: 87, key: "F# minor", coming: true, backing: STUB },
+      9: { title: "Good Riddance (Time of Your Life)", artist: "Green Day", year: 1997, bpm: 80, key: "G major", coming: true, backing: STUB },
+      10: {
+        title: "Wish You Were Here", artist: "Pink Floyd", year: 1975, bpm: 60, key: "G major",
+        backing: { kick: [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], snare: [1,0,0,0, 1,0,0,1, 0,1,0,0, 1,1,1,1] },
+        warmup: { videoId: "4SIqf6ktnYg", label: "Fingerpicking Exercise · YouTube", title: "Fingerpicking Pattern", meta: "This song is all about the right hand · warm up the picking fingers before anything else" },
+        lesson: { videoId: "IzxMeQgtyYE", label: "Marty Music · YouTube" },
+        links: [
+          { label: "🎸 Tab",    url: "https://tabs.ultimate-guitar.com/tab/pink-floyd/wish-you-were-here-tabs-8622" },
+          { label: "🎵 Chords", url: "https://tabs.ultimate-guitar.com/tab/pink-floyd/wish-you-were-here-chords-44555" },
+        ]
+      },
+    }
+  },
+
+  intermediate: {
+    label: 'Intermediate',
+    sessions: {
+      1: { title: "Don't Stop Believin'", artist: "Journey", year: 1981, bpm: 119, key: "E major", coming: true, backing: STUB },
+      2: { title: "Patience", artist: "Guns N' Roses", year: 1988, bpm: 76, key: "G major", coming: true, backing: STUB },
+      3: {
+        title: "You Give Love a Bad Name", artist: "Bon Jovi", year: 1986, bpm: 123, key: "C minor",
+        backing: { kick: [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], snare: [1,0,0,0, 1,0,0,1, 0,1,0,0, 1,1,1,1] },
+        warmup: { videoId: "AXg6T0Tq6Hs", label: "Palm Muting Guide · YouTube", title: "Palm Muting", meta: "That iconic intro punch comes entirely from palm muting · nail the technique before the riff" },
+        lesson: { videoId: "pVnlPaw8Pvk", label: "Marty Music · YouTube" },
+        links: [
+          { label: "🎸 Tab",    url: "https://tabs.ultimate-guitar.com/tab/bon-jovi/you-give-love-a-bad-name-tabs-198860" },
+          { label: "🎵 Chords", url: "https://tabs.ultimate-guitar.com/tab/bon-jovi/you-give-love-a-bad-name-chords-1242523" },
+        ]
+      },
+      4: { title: "Enter Sandman", artist: "Metallica", year: 1991, bpm: 123, key: "E minor", coming: true, backing: STUB },
+      5: {
+        title: "More Than Words", artist: "Extreme", year: 1990, bpm: 97, key: "G major",
+        backing: { kick: [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], snare: [1,0,0,0, 1,0,0,1, 0,1,0,0, 1,1,1,1] },
+        warmup: { videoId: "4SIqf6ktnYg", label: "Fingerpicking Exercise · YouTube", title: "Fingerpicking & Chord Melody", meta: "More Than Words blends chords and melody in the same hand · focus on clean individual note separation" },
+        lesson: { videoId: "T0XzFYChv18", label: "Marty Music · YouTube" },
+        links: [
+          { label: "🎸 Tab",    url: "https://tabs.ultimate-guitar.com/tab/extreme/more-than-words-tabs-51" },
+          { label: "🎵 Chords", url: "https://tabs.ultimate-guitar.com/tab/extreme/more-than-words-chords-4724" },
+        ]
+      },
+      6: {
+        title: "Money for Nothing", artist: "Dire Straits", year: 1985, bpm: 136, key: "G minor",
+        backing: { kick: [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], snare: [1,0,0,0, 1,0,0,1, 0,1,0,0, 1,1,1,1] },
+        warmup: { videoId: "YU0uHsobGmg", label: "Blues Scale Exercises · YouTube", title: "Blues Scale", meta: "Minor pentatonic + the flat 5 blue note · the exact scale behind this riff" },
+        lesson: { videoId: "uIwzFBCPVso", label: "Marty Music · YouTube" },
+        links: [
+          { label: "🎸 Tab",      url: "https://tabs.ultimate-guitar.com/tab/dire-straits/money-for-nothing-tabs-66374" },
+          { label: "🎵 Chords",   url: "https://tabs.ultimate-guitar.com/tab/dire-straits/money-for-nothing-chords-1492334" },
+          { label: "🎸 Intro Riff", url: "https://www.songsterr.com/a/wsa/dire-straits-money-for-nothing-intro-riff-tab-s1193885" },
+        ]
+      },
+      7: { title: "Nothing Else Matters", artist: "Metallica", year: 1991, bpm: 69, key: "E minor", coming: true, backing: STUB },
+      8: { title: "Paradise City", artist: "Guns N' Roses", year: 1987, bpm: 100, key: "G major", coming: true, backing: STUB },
+      9: {
+        title: "Message in a Bottle", artist: "The Police", year: 1979, bpm: 150, key: "C# minor",
+        backing: { kick: [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], snare: [1,0,0,0, 1,0,0,1, 0,1,0,0, 1,1,1,1] },
+        warmup: { videoId: "GYwdxHH9Y_k", label: "Arpeggio Exercises · YouTube", title: "Arpeggio Picking", meta: "Root → 5th → 9th on every chord at 150 BPM · get that picking hand precise before you start" },
+        lesson: { videoId: "kZ-BVTKUVJM", label: "Marty Music · YouTube" },
+        links: [
+          { label: "🎸 Tab",    url: "https://tabs.ultimate-guitar.com/tab/the-police/message-in-a-bottle-chords-1744532" },
+          { label: "🎵 Chords", url: "https://tabs.ultimate-guitar.com/tab/the-police/message-in-a-bottle-chords-1091383" },
+        ]
+      },
+      10: {
+        title: "Tears in Heaven", artist: "Eric Clapton", year: 1992, bpm: 80, key: "A major",
+        backing: { kick: [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], snare: [1,0,0,0, 1,0,0,1, 0,1,0,0, 1,1,1,1] },
+        warmup: { videoId: "4SIqf6ktnYg", label: "Fingerpicking Exercise · YouTube", title: "Travis Picking", meta: "Tears in Heaven uses Travis-style alternating bass fingerpicking · slow it down and isolate the pattern" },
+        lesson: { videoId: "iS9kWyI1dxw", label: "Marty Music · YouTube" },
+        links: [
+          { label: "🎸 Tab",    url: "https://tabs.ultimate-guitar.com/tab/eric-clapton/tears-in-heaven-tabs-3576" },
+          { label: "🎵 Chords", url: "https://tabs.ultimate-guitar.com/tab/eric-clapton/tears-in-heaven-chords-44568" },
+        ]
+      },
+    }
+  },
+
+  advanced: {
+    label: 'Advanced',
+    sessions: {
+      1: { title: "Layla", artist: "Eric Clapton", year: 1970, bpm: 92, key: "D minor", coming: true, backing: STUB },
+      2: { title: "Sweet Child O' Mine", artist: "Guns N' Roses", year: 1987, bpm: 125, key: "D major", coming: true, backing: STUB },
+      3: { title: "Crazy Train", artist: "Ozzy Osbourne", year: 1980, bpm: 138, key: "A minor", coming: true, backing: STUB },
+      4: { title: "November Rain", artist: "Guns N' Roses", year: 1991, bpm: 74, key: "G major", coming: true, backing: STUB },
+      5: { title: "Purple Rain", artist: "Prince", year: 1984, bpm: 113, key: "Bb major", coming: true, backing: STUB },
+      6: {
+        title: "Hotel California", artist: "Eagles", year: 1977, bpm: 75, key: "B minor",
+        backing: { kick: [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], snare: [1,0,0,0, 1,0,0,1, 0,1,0,0, 1,1,1,1] },
+        warmup: { videoId: "GYwdxHH9Y_k", label: "Arpeggio Exercises · YouTube", title: "Arpeggio Patterns", meta: "The intro is a beautiful Bm arpeggio descent · warm up slow picking patterns before tackling it" },
+        lesson: { videoId: "JIDdI-AtK-Q", label: "Marty Music · YouTube" },
+        links: [
+          { label: "🎸 Tab",    url: "https://tabs.ultimate-guitar.com/tab/eagles/hotel-california-tabs-46765" },
+          { label: "🎵 Chords", url: "https://tabs.ultimate-guitar.com/tab/eagles/hotel-california-chords-988" },
+        ]
+      },
+      7: { title: "Blackbird", artist: "The Beatles", year: 1968, bpm: 96, key: "G major", coming: true, backing: STUB },
+      8: { title: "Comfortably Numb", artist: "Pink Floyd", year: 1979, bpm: 63, key: "Bb major", coming: true, backing: STUB },
+      9: { title: "Sultans of Swing", artist: "Dire Straits", year: 1978, bpm: 149, key: "D minor", coming: true, backing: STUB },
+      10: { title: "Stairway to Heaven", artist: "Led Zeppelin", year: 1971, bpm: 72, key: "A minor", coming: true, backing: STUB },
+    }
+  }
+};
+
+// ── State ──────────────────────────────────────────────
+let currentTrack = localStorage.getItem('guitarTrack') || 'beginner';
+let currentWeek  = parseInt(localStorage.getItem('guitarWeekV2') || '1');
+
+if (!TRACKS[currentTrack]) currentTrack = 'beginner';
+if (!TRACKS[currentTrack].sessions[currentWeek]) currentWeek = 1;
+
+function currentSession() { return TRACKS[currentTrack].sessions[currentWeek]; }
+
+// ── Track selector ─────────────────────────────────────
+function buildTrackSelector() {
+  const sel = document.getElementById('trackSelector');
+  sel.innerHTML = '';
+  Object.keys(TRACKS).forEach(key => {
+    const btn = document.createElement('button');
+    btn.className = 'track-btn' + (key === currentTrack ? ' active' : '');
+    btn.dataset.track = key;
+    btn.textContent = TRACKS[key].label;
+    btn.onclick = () => setTrack(key);
+    sel.appendChild(btn);
+  });
+}
+
+function setTrack(track) {
+  currentTrack = track;
+  currentWeek  = 1;
+  localStorage.setItem('guitarTrack', track);
+  localStorage.setItem('guitarWeekV2', '1');
+  document.querySelectorAll('.track-btn').forEach(b => b.classList.toggle('active', b.dataset.track === track));
+  stopBacking();
+  buildWeekSelector();
+  renderSession(currentSession());
+  renderBtGrid();
+  resetPlayer();
+}
+
+// ── Week selector ──────────────────────────────────────
+function buildWeekSelector() {
+  const sel = document.getElementById('weekSelector');
+  sel.innerHTML = '';
+  const sessions = TRACKS[currentTrack].sessions;
+  Object.keys(sessions).forEach(w => {
+    const wNum = parseInt(w);
+    const s = sessions[wNum];
+    const btn = document.createElement('button');
+    let cls = 'week-btn';
+    if (wNum === currentWeek) cls += ' active';
+    if (s.coming) cls += ' coming';
+    btn.className = cls;
+    btn.dataset.week = wNum;
+    btn.title = s.title + ' — ' + s.artist;
+    btn.textContent = 'Week ' + wNum;
+    btn.onclick = () => setWeek(wNum);
+    sel.appendChild(btn);
+  });
+  const a = document.createElement('a');
+  a.href = 'strumming.html';
+  a.className = 'week-btn';
+  a.style.cssText = 'margin-left:auto; text-decoration:none; white-space:nowrap;';
+  a.textContent = '🥁 Trainer';
+  sel.appendChild(a);
+}
+
+function setWeek(w) {
+  currentWeek = w;
+  localStorage.setItem('guitarWeekV2', w);
+  document.querySelectorAll('.week-btn[data-week]').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.week) === w);
+  });
+  stopBacking();
+  renderSession(currentSession());
+  renderBtGrid();
+  resetPlayer();
+}
+
+// ── Session rendering ──────────────────────────────────
+function renderSession(s) {
+  document.getElementById('hLabel').textContent  = TRACKS[currentTrack].label + ' · Week ' + currentWeek;
+  document.getElementById('hTitle').textContent  = s.title;
+  document.getElementById('hArtist').textContent = s.artist + ' · ' + s.year;
+  document.getElementById('hBpm').textContent    = s.bpm;
+  document.getElementById('hKey').textContent    = s.key;
+
+  const coming = !!s.coming;
+  document.getElementById('stepsSection').style.display = coming ? 'none' : '';
+  document.getElementById('comingSoon').style.display   = coming ? 'flex' : 'none';
+
+  if (!coming) {
+    const wId = s.warmup.videoId;
+    document.getElementById('warmupTitle').textContent = s.warmup.title;
+    document.getElementById('warmupMeta').textContent  = s.warmup.meta;
+    document.getElementById('warmupThumb').href = 'https://www.youtube.com/watch?v=' + wId;
+    document.getElementById('warmupImg').src    = 'https://img.youtube.com/vi/' + wId + '/hqdefault.jpg';
+    document.getElementById('warmupLabel').textContent = s.warmup.label;
+
+    const lId = s.lesson.videoId;
+    document.getElementById('lessonThumb').href = 'https://www.youtube.com/watch?v=' + lId;
+    document.getElementById('lessonImg').src    = 'https://img.youtube.com/vi/' + lId + '/hqdefault.jpg';
+    document.getElementById('lessonLabel').textContent = s.lesson.label || 'Marty Music · YouTube';
+
+    document.getElementById('tabLinks').innerHTML = s.links.map(l =>
+      `<a href="${l.url}" target="_blank" class="link-pill">${l.label}</a>`
+    ).join('');
+
+    document.getElementById('playerSongName').textContent = s.title + ' — ' + s.artist;
+  }
+}
+
+// ── Audio state ────────────────────────────────────────
+const AC = window.AudioContext || window.webkitAudioContext;
+let actx = null, audioBuffer = null, source = null;
+let mode = 'loop', isPlaying = false, animFrame = null;
+let startCtxTime = 0, startOffset = 0;
+
+let pitchSemitones = 0;
+let shifter = null;
+let stModule = null;
+
+async function loadST() {
+  if (!stModule) stModule = await import('https://cdn.jsdelivr.net/gh/cutterbl/SoundTouchJS/dist/soundtouch.js');
+  return stModule;
+}
+
+function getCtx() { if (!actx) actx = new AC(); return actx; }
+function parseTime(s) {
+  const p = s.trim().split(':');
+  return p.length === 2 ? parseFloat(p[0]) * 60 + parseFloat(p[1]) : parseFloat(p[0]) || 0;
+}
+function fmtTime(s) {
+  const m = Math.floor(s / 60), sec = Math.floor(s % 60);
+  return m + ':' + String(sec).padStart(2, '0');
+}
+function getA() { return Math.max(0, parseTime(document.getElementById('markerA').value)); }
+function getB() { return audioBuffer ? Math.min(parseTime(document.getElementById('markerB').value), audioBuffer.duration) : 0; }
+function getSpeed() { return parseFloat(document.getElementById('speedSlider').value) / 100; }
+
+async function loadFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  resetPlayer();
+  const ctx = getCtx();
+  try {
+    audioBuffer = await ctx.decodeAudioData(await file.arrayBuffer());
+  } catch(e) {
+    document.getElementById('playerHint').textContent = 'Could not decode file — try MP3 or M4A';
+    return;
+  }
+  document.getElementById('markerA').value = '0:00';
+  document.getElementById('markerB').value = fmtTime(audioBuffer.duration);
+  document.getElementById('playerBody').classList.add('loaded');
+  document.getElementById('playerHint').textContent = file.name;
+  drawWaveform(audioBuffer);
+  updateRegion();
+}
+
+function resetPlayer() {
+  stopSrc();
+  isPlaying = false; startOffset = 0;
+  audioBuffer = null;
+  pitchSemitones = 0;
+  document.getElementById('pitchSlider').value = 0;
+  document.getElementById('pitchVal').textContent = 'Original';
+  document.getElementById('playerBody').classList.remove('loaded');
+  document.getElementById('playBtn').textContent = '▶ Play';
+  document.getElementById('dot').classList.remove('on');
+  document.getElementById('playhead').style.left = '0%';
+  document.getElementById('timeDisp').textContent = '0:00 / 0:00';
+  document.getElementById('waveformBg').innerHTML = '';
+  document.getElementById('fileInput').value = '';
+}
+
+function setMode(m) {
+  mode = m;
+  document.getElementById('modeLoopBtn').classList.toggle('active', m === 'loop');
+  document.getElementById('modeFullBtn').classList.toggle('active', m === 'full');
+  document.getElementById('loopSection').style.display = m === 'loop' ? 'block' : 'none';
+  updateRegion();
+  if (isPlaying) { const pos = currentPos(); stopSrc(); startOffset = pos; startSrc(); }
+  else { startOffset = m === 'loop' ? getA() : 0; }
+}
+
+function onPitchChange(val) {
+  pitchSemitones = val;
+  document.getElementById('pitchVal').textContent =
+    val === 0 ? 'Original' : (val > 0 ? '+' : '') + val + ' semi';
+  if (isPlaying) { const pos = currentPos(); stopSrc(); startOffset = pos; startSrc(); }
+}
+
+function drawWaveform(buf) {
+  const bg = document.getElementById('waveformBg');
+  bg.innerHTML = '';
+  const data = buf.getChannelData(0), bars = 80, step = Math.floor(data.length / bars);
+  for (let i = 0; i < bars; i++) {
+    let max = 0;
+    for (let j = 0; j < step; j++) max = Math.max(max, Math.abs(data[i * step + j]));
+    const b = document.createElement('div');
+    b.className = 'w-bar';
+    b.style.height = Math.max(8, max * 100) + '%';
+    bg.appendChild(b);
+  }
+}
+
+function updateRegion() {
+  if (!audioBuffer) return;
+  const region = document.getElementById('waveformRegion');
+  if (mode === 'full') { region.style.width = '0'; return; }
+  const dur = audioBuffer.duration;
+  region.style.left  = (getA() / dur * 100) + '%';
+  region.style.width = ((getB() - getA()) / dur * 100) + '%';
+  if (isPlaying) { stopSrc(); startOffset = getA(); startSrc(); }
+}
+
+function seekTo(e) {
+  if (!audioBuffer) return;
+  const bar = document.getElementById('waveformBar');
+  const pct = (e.offsetX / bar.offsetWidth) * 100;
+  startOffset = (pct / 100) * audioBuffer.duration;
+  if (isPlaying) {
+    if (shifter) { shifter.percentagePlayed = pct; }
+    else { stopSrc(); startSrc(); }
+  }
+}
+
+async function startSrc() {
+  if (pitchSemitones !== 0) {
+    const mod = await loadST();
+    startSrcWithPitch(mod.PitchShifter);
+  } else {
+    startSrcDirect();
+  }
+}
+
+function startSrcDirect() {
+  const ctx = getCtx();
+  if (ctx.state === 'suspended') ctx.resume();
+  const isLoop = mode === 'loop';
+  const a = isLoop ? getA() : 0;
+  const b = isLoop ? getB() : audioBuffer.duration;
+  const spd = getSpeed();
+  const from = Math.max(a, Math.min(startOffset, b - 0.05));
+
+  source = ctx.createBufferSource();
+  source.buffer = audioBuffer;
+  source.playbackRate.value = spd;
+  source.loop = isLoop;
+  source.loopStart = a;
+  source.loopEnd = b;
+  source.connect(ctx.destination);
+  source.start(0, from);
+  startCtxTime = ctx.currentTime;
+  startOffset = from;
+  isPlaying = true;
+  source.onended = onEnded;
+  document.getElementById('playBtn').textContent = '⏸ Pause';
+  document.getElementById('dot').classList.add('on');
+  tick();
+}
+
+function startSrcWithPitch(PitchShifter) {
+  const ctx = getCtx();
+  if (ctx.state === 'suspended') ctx.resume();
+  const from = Math.max(0, Math.min(startOffset, audioBuffer.duration - 0.05));
+  const pct  = (from / audioBuffer.duration) * 100;
+
+  const handleEnd = () => {
+    if (mode === 'loop' && shifter) {
+      shifter.percentagePlayed = (getA() / audioBuffer.duration) * 100;
+    } else {
+      onEnded();
+    }
+  };
+
+  shifter = new PitchShifter(ctx, audioBuffer, 4096, handleEnd);
+  shifter.pitchSemitones = pitchSemitones;
+  shifter.tempo = getSpeed();
+  shifter.percentagePlayed = pct;
+  shifter.connect(ctx.destination);
+
+  startCtxTime = ctx.currentTime;
+  startOffset = from;
+  isPlaying = true;
+  document.getElementById('playBtn').textContent = '⏸ Pause';
+  document.getElementById('dot').classList.add('on');
+  tick();
+}
+
+function stopSrc() {
+  if (source) { try { source.stop(); } catch(e){} source = null; }
+  if (shifter) { try { shifter.disconnect(); } catch(e){} shifter = null; }
+  cancelAnimationFrame(animFrame);
+}
+
+function onEnded() {
+  isPlaying = false; startOffset = 0;
+  document.getElementById('playBtn').textContent = '▶ Play';
+  document.getElementById('dot').classList.remove('on');
+  document.getElementById('playhead').style.left = '0%';
+  cancelAnimationFrame(animFrame);
+}
+
+function currentPos() {
+  if (!audioBuffer) return 0;
+  if (shifter) {
+    return Math.min((shifter.percentagePlayed / 100) * audioBuffer.duration, audioBuffer.duration);
+  }
+  const spd = getSpeed();
+  let t = startOffset + (getCtx().currentTime - startCtxTime) * spd;
+  if (mode === 'loop') { const a = getA(), b = getB(); if (t > b) t = a + ((t - a) % (b - a)); }
+  return Math.min(t, audioBuffer.duration);
+}
+
+function togglePlay() {
+  if (!audioBuffer) return;
+  if (isPlaying) {
+    const pos = currentPos(); stopSrc(); startOffset = pos; isPlaying = false;
+    document.getElementById('playBtn').textContent = '▶ Play';
+    document.getElementById('dot').classList.remove('on');
+  } else { startSrc(); }
+}
+
+function stopAndReset() {
+  stopSrc(); isPlaying = false; startOffset = 0;
+  document.getElementById('playBtn').textContent = '▶ Play';
+  document.getElementById('dot').classList.remove('on');
+  document.getElementById('playhead').style.left = '0%';
+}
+
+function setMarkerNow(which) {
+  if (!audioBuffer) return;
+  document.getElementById('marker' + which).value = fmtTime(isPlaying ? currentPos() : startOffset);
+  updateRegion();
+}
+
+function onSpeedChange(val) {
+  document.getElementById('speedVal').textContent = val + '%';
+  if (isPlaying) {
+    if (shifter) { shifter.tempo = val / 100; }
+    else { const pos = currentPos(); stopSrc(); startOffset = pos; startSrc(); }
+  }
+}
+
+function tick() {
+  if (!isPlaying || !audioBuffer) return;
+  let t = currentPos();
+  if (shifter && mode === 'loop') {
+    const b = getB();
+    if (t >= b - 0.05) {
+      const aPct = (getA() / audioBuffer.duration) * 100;
+      shifter.percentagePlayed = aPct;
+      t = getA();
+    }
+  }
+  document.getElementById('playhead').style.left = (t / audioBuffer.duration * 100).toFixed(1) + '%';
+  document.getElementById('timeDisp').textContent = fmtTime(t) + ' / ' + fmtTime(audioBuffer.duration);
+  animFrame = requestAnimationFrame(tick);
+}
+
+// ── Backing track ──────────────────────────────────────
+let btOn = false, btTimer = null, btStep = 0, btNextTime = 0, btGen = 0;
+
+function toggleBacking() { btOn ? stopBacking() : startBacking(); }
+
+function startBacking() {
+  const ctx = getCtx();
+  btStep = 0;
+  btNextTime = ctx.currentTime + 0.05;
+  btOn = true;
+  btGen++;
+  btTimer = setInterval(runBtSched, 20);
+  document.getElementById('btBtn').textContent = '⏸ Pause';
+}
+
+function stopBacking() {
+  btOn = false;
+  btGen++;
+  clearInterval(btTimer);
+  btStep = 0;
+  document.querySelectorAll('.bt-step').forEach(el => el.classList.remove('current'));
+  document.getElementById('btBtn').textContent = '▶ Play';
+}
+
+function runBtSched() {
+  const ctx = getCtx();
+  const { bpm, backing } = currentSession();
+  if (!backing) return;
+  const { kick, snare } = backing;
+  const steps = kick.length;
+  const stepDur = 60 / bpm / 4;
+  const vol = parseInt(document.getElementById('btVol').value) / 100;
+
+  while (btNextTime < ctx.currentTime + 0.12) {
+    const s = btStep % steps;
+    if (kick[s])  playKick(btNextTime, vol);
+    if (snare[s]) playSnare(btNextTime, vol * 0.85);
+    const captured = s, gen = btGen;
+    setTimeout(() => { if (btGen === gen) highlightBtStep(captured); },
+      Math.max(0, (btNextTime - ctx.currentTime) * 1000));
+    btStep++;
+    btNextTime += stepDur;
+  }
+}
+
+function highlightBtStep(step) {
+  document.querySelectorAll('.bt-step').forEach(el => {
+    el.classList.toggle('current', +el.dataset.col === step);
+  });
+}
+
+function playKick(time, vol) {
+  const ctx = getCtx();
+  const osc  = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain); gain.connect(ctx.destination);
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(180, time);
+  osc.frequency.exponentialRampToValueAtTime(42, time + 0.25);
+  gain.gain.setValueAtTime(vol, time);
+  gain.gain.exponentialRampToValueAtTime(0.001, time + 0.55);
+  osc.start(time); osc.stop(time + 0.6);
+}
+
+function playSnare(time, vol) {
+  const ctx = getCtx();
+  const len = Math.round(ctx.sampleRate * 0.25);
+  const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+  const d   = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+  const noise = ctx.createBufferSource();
+  noise.buffer = buf;
+  const hpf = ctx.createBiquadFilter();
+  hpf.type = 'highpass'; hpf.frequency.value = 2200;
+  const ng = ctx.createGain();
+  ng.gain.setValueAtTime(vol * 0.65, time);
+  ng.gain.exponentialRampToValueAtTime(0.001, time + 0.18);
+  noise.connect(hpf); hpf.connect(ng); ng.connect(ctx.destination);
+  noise.start(time); noise.stop(time + 0.22);
+  const osc = ctx.createOscillator();
+  const og  = ctx.createGain();
+  osc.frequency.value = 185;
+  osc.connect(og); og.connect(ctx.destination);
+  og.gain.setValueAtTime(vol * 0.45, time);
+  og.gain.exponentialRampToValueAtTime(0.001, time + 0.07);
+  osc.start(time); osc.stop(time + 0.09);
+}
+
+function renderBtGrid() {
+  const grid = document.getElementById('btGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  const { backing } = currentSession();
+  if (!backing) return;
+
+  const tracks = [
+    { name: 'Kick',  data: backing.kick,  cls: 'kick-on' },
+    { name: 'Snare', data: backing.snare, cls: 'snare-on' },
+  ];
+
+  tracks.forEach(({ name, data, cls }) => {
+    const row = document.createElement('div');
+    row.className = 'bt-row';
+    const lbl = document.createElement('div');
+    lbl.className = 'bt-label';
+    lbl.textContent = name;
+    row.appendChild(lbl);
+    const cells = document.createElement('div');
+    cells.className = 'bt-cells';
+    data.forEach((on, i) => {
+      if (i > 0 && i % 4 === 0) {
+        const sep = document.createElement('div');
+        sep.className = 'bt-sep';
+        cells.appendChild(sep);
+      }
+      const cell = document.createElement('div');
+      cell.className = 'bt-step' + (on ? ' ' + cls : '');
+      cell.dataset.col = i;
+      cells.appendChild(cell);
+    });
+    row.appendChild(cells);
+    grid.appendChild(row);
+  });
+
+  const beatRow = document.createElement('div');
+  beatRow.className = 'bt-row';
+  const beatLblSpacer = document.createElement('div');
+  beatLblSpacer.className = 'bt-label';
+  beatRow.appendChild(beatLblSpacer);
+  const beatCells = document.createElement('div');
+  beatCells.className = 'bt-cells';
+  const beatNames = ['1','e','&','a', '2','e','&','a', '3','e','&','a', '4','e','&','a'];
+  backing.kick.forEach((_, i) => {
+    if (i > 0 && i % 4 === 0) {
+      const sep = document.createElement('div'); sep.className = 'bt-sep';
+      beatCells.appendChild(sep);
+    }
+    const lbl = document.createElement('div');
+    lbl.className = 'bt-beat-lbl';
+    lbl.textContent = (i % 4 === 0) ? beatNames[i] : '';
+    beatCells.appendChild(lbl);
+  });
+  beatRow.appendChild(beatCells);
+  grid.appendChild(beatRow);
+}
+
+// ── Init ───────────────────────────────────────────────
+buildTrackSelector();
+buildWeekSelector();
+renderSession(currentSession());
+renderBtGrid();
+</script>
+</body>
+</html>

@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Strumming Trainer · Guitar Practice</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #0f0f0f; color: #e0e0e0;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  padding: 40px 20px 80px; max-width: 720px; margin: 0 auto;
+}
+
+.back-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  color: #444; font-size: 13px; text-decoration: none;
+  margin-bottom: 36px; transition: color 0.2s;
+}
+.back-link:hover { color: #f5a623; }
+
+.page-label { font-size: 11px; text-transform: uppercase; letter-spacing: 3px; color: #f5a623; margin-bottom: 8px; }
+h1 { font-size: 32px; font-weight: 800; color: #fff; letter-spacing: -0.5px; margin-bottom: 4px; }
+.subtitle { font-size: 14px; color: #555; margin-bottom: 36px; }
+
+.card { background: #141414; border: 1px solid #222; border-radius: 10px; padding: 22px; margin-bottom: 16px; }
+.card-header { font-size: 10px; text-transform: uppercase; letter-spacing: 2.5px; color: #333; margin-bottom: 18px; }
+
+/* BPM */
+.bpm-row { display: flex; align-items: center; gap: 20px; margin-bottom: 18px; }
+.bpm-big { font-size: 52px; font-weight: 800; color: #fff; min-width: 90px; line-height: 1; font-variant-numeric: tabular-nums; }
+.bpm-unit { font-size: 12px; color: #444; margin-top: 4px; }
+.bpm-right { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+.bpm-btns { display: flex; gap: 5px; }
+.bpm-btn {
+  flex: 1; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 6px;
+  color: #555; font-size: 11px; font-weight: 600; padding: 7px 0;
+  cursor: pointer; transition: all 0.15s; text-align: center;
+}
+.bpm-btn:hover { border-color: #f5a623; color: #f5a623; }
+.tap-btn {
+  background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 6px;
+  color: #555; font-size: 11px; font-weight: 600; padding: 7px 14px;
+  cursor: pointer; transition: all 0.15s; white-space: nowrap;
+}
+.tap-btn:hover { border-color: #f5a623; color: #f5a623; }
+.tap-btn:active { background: rgba(245,166,35,0.1); }
+input[type=range] { width: 100%; accent-color: #f5a623; cursor: pointer; }
+
+/* Pattern pills */
+.pattern-pills { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+.ppill {
+  background: transparent; border: 1px solid #2a2a2a; border-radius: 20px;
+  color: #444; font-size: 12px; font-weight: 600; padding: 7px 14px;
+  cursor: pointer; transition: all 0.15s;
+}
+.ppill:hover { border-color: #666; color: #888; }
+.ppill.active { border-color: #f5a623; color: #f5a623; background: rgba(245,166,35,0.08); }
+
+/* Action buttons */
+.action-row { display: flex; gap: 10px; }
+.btn-main {
+  flex: 1; background: #f5a623; color: #000; border: none; border-radius: 8px;
+  padding: 13px 20px; font-size: 14px; font-weight: 700; cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-main:hover { background: #e09615; }
+.btn-main.on { background: #c94040; color: #fff; }
+.btn-main.on:hover { background: #a83535; }
+.btn-mic {
+  background: #141414; border: 1px solid #2a2a2a; border-radius: 8px;
+  color: #555; font-size: 13px; font-weight: 600; padding: 13px 18px;
+  cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 9px;
+}
+.btn-mic:hover { border-color: #555; color: #888; }
+.btn-mic.on { border-color: #2d9c5c; color: #2d9c5c; }
+.mic-dot { width: 8px; height: 8px; border-radius: 50%; background: #333; flex-shrink: 0; transition: background 0.2s; }
+.mic-dot.on { background: #2d9c5c; }
+
+/* Beat circles */
+.beats-wrap { display: flex; gap: 10px; justify-content: center; margin-bottom: 24px; }
+.beat-circle {
+  width: 68px; height: 68px; border-radius: 50%;
+  border: 2px solid #222; background: #111;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: 800; color: #2a2a2a;
+  transition: all 0.05s ease-out;
+}
+.beat-circle.active {
+  border-color: #f5a623; background: rgba(245,166,35,0.12);
+  color: #f5a623; transform: scale(1.1);
+  box-shadow: 0 0 20px rgba(245,166,35,0.25);
+}
+
+/* Pattern grid */
+.pgrid {
+  display: grid; grid-template-columns: repeat(8, 1fr);
+  gap: 5px; margin-bottom: 24px;
+}
+.pgrid-lbl { font-size: 10px; color: #2a2a2a; text-align: center; padding-bottom: 4px; font-weight: 700; }
+.pgrid-cell {
+  height: 38px; border-radius: 6px; background: #1a1a1a;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: #2a2a2a;
+  transition: all 0.07s; border: 1px solid transparent;
+}
+.pgrid-cell.strum { color: #f5a623; background: rgba(245,166,35,0.08); border-color: rgba(245,166,35,0.15); }
+.pgrid-cell.current { background: rgba(245,166,35,0.22); color: #fff; border-color: #f5a623; transform: scaleY(1.06); }
+
+/* Timing meter */
+.meter-section { margin-bottom: 24px; }
+.meter-labels { display: flex; justify-content: space-between; font-size: 10px; color: #2a2a2a; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.meter-track {
+  position: relative; height: 18px; border-radius: 9px; overflow: visible;
+  background: linear-gradient(to right,
+    #4a0f0f 0%, #c94040 12%, #f5a623 23%,
+    #2d9c5c 40%, #2d9c5c 60%,
+    #f5a623 77%, #c94040 88%, #4a0f0f 100%);
+  margin-bottom: 16px;
+}
+.meter-needle {
+  position: absolute; top: -5px; bottom: -5px; width: 4px;
+  border-radius: 2px; background: #fff; left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 0 10px rgba(255,255,255,0.5);
+  transition: left 0.12s ease-out, background 0.15s, box-shadow 0.15s;
+}
+.meter-readout {
+  text-align: center; font-size: 28px; font-weight: 800;
+  color: #2a2a2a; font-variant-numeric: tabular-nums; min-height: 38px;
+  transition: color 0.15s;
+}
+
+/* History */
+.history-strip { display: flex; gap: 5px; justify-content: center; margin-bottom: 12px; }
+.h-dot { width: 14px; height: 14px; border-radius: 50%; background: #1a1a1a; transition: background 0.3s; }
+.accuracy-txt { text-align: center; font-size: 12px; color: #333; min-height: 18px; }
+
+/* Settings */
+.setting-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.setting-lbl { font-size: 12px; color: #555; min-width: 90px; }
+.setting-val { font-size: 12px; color: #f5a623; font-weight: 700; min-width: 44px; text-align: right; }
+.setting-note { font-size: 11px; color: #2a2a2a; line-height: 1.6; margin-top: 6px; }
+</style>
+</head>
+<body>
+
+<a href="index.html" class="back-link">← Guitar Practice</a>
+
+<div class="page-label">Practice Tool</div>
+<h1>Strumming Trainer</h1>
+<p class="subtitle">Mic-powered timing feedback against a stable metronome</p>
+
+<!-- Controls -->
+<div class="card">
+  <div class="card-header">Metronome</div>
+
+  <div class="bpm-row">
+    <div>
+      <div class="bpm-big" id="bpmDisplay">80</div>
+      <div class="bpm-unit">BPM</div>
+    </div>
+    <div class="bpm-right">
+      <input type="range" id="bpmSlider" min="40" max="220" value="80" oninput="setBpm(+this.value)">
+      <div class="bpm-btns">
+        <button class="bpm-btn" onclick="changeBpm(-10)">−10</button>
+        <button class="bpm-btn" onclick="changeBpm(-5)">−5</button>
+        <button class="bpm-btn" onclick="changeBpm(-1)">−1</button>
+        <button class="bpm-btn" onclick="changeBpm(+1)">+1</button>
+        <button class="bpm-btn" onclick="changeBpm(+5)">+5</button>
+        <button class="bpm-btn" onclick="changeBpm(+10)">+10</button>
+        <button class="tap-btn" onclick="tapTempo()">Tap</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="pattern-pills" id="patternPills"></div>
+
+  <div class="action-row">
+    <button class="btn-main" id="metroBtn" onclick="toggleMetro()">▶ Start Metronome</button>
+    <button class="btn-mic" id="micBtn" onclick="toggleMic()">
+      <span class="mic-dot" id="micDot"></span>
+      <span id="micLabel">Mic off</span>
+    </button>
+  </div>
+</div>
+
+<!-- Live display -->
+<div class="card">
+  <div class="card-header">Live</div>
+
+  <div class="beats-wrap">
+    <div class="beat-circle" id="beat0">1</div>
+    <div class="beat-circle" id="beat1">2</div>
+    <div class="beat-circle" id="beat2">3</div>
+    <div class="beat-circle" id="beat3">4</div>
+  </div>
+
+  <div class="pgrid" id="pgrid"></div>
+
+  <div class="meter-section">
+    <div class="meter-labels"><span>← Early</span><span>Perfect</span><span>Late →</span></div>
+    <div class="meter-track">
+      <div class="meter-needle" id="needle"></div>
+    </div>
+    <div class="meter-readout" id="readout">—</div>
+  </div>
+
+  <div class="history-strip" id="histStrip"></div>
+  <div class="accuracy-txt" id="accTxt">Start the metronome and enable mic to begin</div>
+</div>
+
+<!-- Settings -->
+<div class="card">
+  <div class="card-header">Settings</div>
+
+  <div class="setting-row">
+    <span class="setting-lbl">Sensitivity</span>
+    <input type="range" id="sensitivitySlider" min="0.01" max="0.4" step="0.01" value="0.08">
+    <span class="setting-val" id="sensitivityVal">0.08</span>
+  </div>
+  <div class="setting-row">
+    <span class="setting-lbl">Mic latency</span>
+    <input type="range" id="latencySlider" min="-200" max="200" step="5" value="0">
+    <span class="setting-val" id="latencyVal">0ms</span>
+  </div>
+  <p class="setting-note">
+    If timing reads consistently late, increase mic latency. If strums aren't being detected, lower sensitivity. If you're getting false triggers (noise), raise it.
+  </p>
+</div>
+
+<script>
+// ── Patterns ──────────────────────────────────────────
+// 8 slots = 8th-note positions in a 4/4 bar
+// null = rest, 'D'/'U' = strum
+const PATTERNS = [
+  { name:'Quarter Notes', strums:['D', null,'D', null,'D', null,'D', null] },
+  { name:'Down-Up',       strums:['D', 'U', 'D', 'U', 'D', 'U', 'D', 'U'] },
+  { name:'Classic Rock',  strums:['D', null,'D', 'U', null,'U', 'D', 'U'] },
+  { name:'Ballad',        strums:['D', null, null,'D', 'U', null,'D', 'U'] },
+];
+
+// ── State ─────────────────────────────────────────────
+let bpm = 80, patIdx = 0, actx = null;
+let metroOn = false, schedTimer = null;
+let nextBeat8Audio = 0, beat8Count = 0;
+let metroStartAudio = 0, metroStartPerf = 0;
+let micOn = false, micStream = null, analyser = null, rafId = null;
+let prevRMS = 0, lastOnset = -Infinity;
+let tapTimes = [];
+const HIST = 16;
+let history = [];
+
+// ── AudioContext ──────────────────────────────────────
+function getCtx() {
+  if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+  if (actx.state === 'suspended') actx.resume();
+  return actx;
+}
+function e8dur() { return 30 / bpm; } // 8th note duration in seconds
+
+// ── BPM ───────────────────────────────────────────────
+function setBpm(v) {
+  bpm = Math.max(40, Math.min(220, Math.round(+v)));
+  document.getElementById('bpmDisplay').textContent = bpm;
+  document.getElementById('bpmSlider').value = bpm;
+}
+function changeBpm(d) { setBpm(bpm + d); }
+
+function tapTempo() {
+  const now = performance.now();
+  tapTimes = tapTimes.filter(t => now - t < 3000);
+  tapTimes.push(now);
+  if (tapTimes.length >= 2) {
+    let total = 0;
+    for (let i = 1; i < tapTimes.length; i++) total += tapTimes[i] - tapTimes[i - 1];
+    setBpm(Math.round(60000 / (total / (tapTimes.length - 1))));
+  }
+}
+
+// ── Metronome ─────────────────────────────────────────
+function toggleMetro() {
+  metroOn ? stopMetro() : startMetro();
+}
+
+function startMetro() {
+  const ctx = getCtx();
+  const delay = 0.1;
+  nextBeat8Audio  = ctx.currentTime + delay;
+  metroStartAudio = nextBeat8Audio;
+  metroStartPerf  = performance.now() + delay * 1000;
+  beat8Count = 0;
+  metroOn = true;
+  schedTimer = setInterval(runSched, 20);
+  const btn = document.getElementById('metroBtn');
+  btn.textContent = '■ Stop Metronome';
+  btn.classList.add('on');
+}
+
+function stopMetro() {
+  metroOn = false;
+  clearInterval(schedTimer);
+  beat8Count = 0;
+  document.querySelectorAll('.beat-circle').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.pgrid-cell').forEach(c => c.classList.remove('current'));
+  const btn = document.getElementById('metroBtn');
+  btn.textContent = '▶ Start Metronome';
+  btn.classList.remove('on');
+}
+
+function runSched() {
+  const ctx = getCtx();
+  while (nextBeat8Audio < ctx.currentTime + 0.12) {
+    const b = beat8Count % 8;
+    scheduleTick(b, nextBeat8Audio);
+    const cap = b;
+    const delayMs = Math.max(0, (nextBeat8Audio - ctx.currentTime) * 1000);
+    setTimeout(() => flashBeat(cap), delayMs);
+    beat8Count++;
+    nextBeat8Audio += e8dur();
+  }
+}
+
+function scheduleTick(beat8, time) {
+  const ctx = getCtx();
+  const isDown = beat8 === 0;
+  const isQ    = beat8 % 2 === 0;
+  const hasStrum = PATTERNS[patIdx].strums[beat8] !== null;
+  if (!isQ && !hasStrum) return; // skip silent 8ths
+
+  const osc  = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+
+  if (isDown)   { osc.frequency.value = 1200; gain.gain.setValueAtTime(0.55, time); }
+  else if (isQ) { osc.frequency.value = 900;  gain.gain.setValueAtTime(0.28, time); }
+  else          { osc.frequency.value = 660;  gain.gain.setValueAtTime(0.10, time); }
+
+  gain.gain.exponentialRampToValueAtTime(0.001, time + 0.05);
+  osc.start(time);
+  osc.stop(time + 0.08);
+}
+
+function flashBeat(beat8) {
+  const q = Math.floor(beat8 / 2);
+  document.querySelectorAll('.beat-circle').forEach((c, i) => {
+    c.classList.toggle('active', i === q);
+  });
+  for (let i = 0; i < 8; i++) {
+    const el = document.getElementById('gc' + i);
+    if (el) el.classList.toggle('current', i === beat8);
+  }
+}
+
+// ── Mic ───────────────────────────────────────────────
+async function enableMic() {
+  try {
+    micStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+    const ctx = getCtx();
+    const src = ctx.createMediaStreamSource(micStream);
+    analyser = ctx.createAnalyser();
+    analyser.fftSize = 512;
+    analyser.smoothingTimeConstant = 0.1;
+    src.connect(analyser); // NOT to destination — avoids feedback
+    micOn = true;
+    updateMicBtn();
+    rafId = requestAnimationFrame(detectOnset);
+  } catch (e) {
+    alert('Microphone access failed: ' + (e.message || e));
+  }
+}
+
+function disableMic() {
+  micOn = false;
+  cancelAnimationFrame(rafId);
+  if (micStream) { micStream.getTracks().forEach(t => t.stop()); micStream = null; }
+  analyser = null;
+  updateMicBtn();
+}
+
+function toggleMic() {
+  micOn ? disableMic() : enableMic();
+}
+
+function updateMicBtn() {
+  document.getElementById('micDot').classList.toggle('on', micOn);
+  document.getElementById('micLabel').textContent = micOn ? 'Mic on' : 'Mic off';
+  document.getElementById('micBtn').classList.toggle('on', micOn);
+}
+
+function detectOnset() {
+  if (!micOn || !analyser) return;
+  rafId = requestAnimationFrame(detectOnset);
+
+  const data = new Float32Array(analyser.fftSize);
+  analyser.getFloatTimeDomainData(data);
+
+  let sum = 0;
+  for (let i = 0; i < data.length; i++) sum += data[i] * data[i];
+  const rms = Math.sqrt(sum / data.length);
+
+  const threshold = +document.getElementById('sensitivitySlider').value;
+  const now = performance.now();
+
+  // Rising edge: RMS crosses threshold from well below
+  if (rms > threshold && prevRMS < threshold * 0.5 && now - lastOnset > 120) {
+    lastOnset = now;
+    onStrum(now);
+  }
+  prevRMS = rms;
+}
+
+// ── Timing ────────────────────────────────────────────
+function onStrum(perfNow) {
+  if (!metroOn) {
+    // Flash detection confirmation even without metronome
+    const r = document.getElementById('readout');
+    r.textContent = '↓';
+    r.style.color = '#555';
+    return;
+  }
+
+  // Elapsed seconds since beat 0 (using perf/audio sync established at start)
+  const elapsed = (perfNow - metroStartPerf) / 1000;
+  const e8 = e8dur();
+  const barDur = e8 * 8;
+  const posInBar = ((elapsed % barDur) + barDur) % barDur;
+  const exactPos = posInBar / e8; // 0.0 – 8.0
+
+  // Nearest active strum position in pattern
+  const strums = PATTERNS[patIdx].strums;
+  const active = strums.reduce((acc, s, i) => { if (s !== null) acc.push(i); return acc; }, []);
+  if (!active.length) return;
+
+  let nearest = active[0], minD = Infinity;
+  for (const p of active) {
+    let d = Math.abs(exactPos - p);
+    if (d > 4) d = 8 - d; // wrap around bar boundary
+    if (d < minD) { minD = d; nearest = p; }
+  }
+
+  let offsetMs = (exactPos - nearest) * e8 * 1000;
+  const halfStep = e8 * 500;
+  if (offsetMs >  halfStep) offsetMs -= e8 * 1000;
+  if (offsetMs < -halfStep) offsetMs += e8 * 1000;
+
+  offsetMs -= +document.getElementById('latencySlider').value;
+
+  recordTiming(offsetMs);
+}
+
+function recordTiming(ms) {
+  const abs = Math.abs(ms);
+  const color = abs < 30 ? '#2d9c5c' : abs < 80 ? '#f5a623' : '#c94040';
+
+  // Needle
+  const pct = 50 + Math.max(-50, Math.min(50, ms / 150 * 50));
+  const needle = document.getElementById('needle');
+  needle.style.left = pct + '%';
+  needle.style.background = color;
+  needle.style.boxShadow = `0 0 10px ${color}99`;
+
+  // Readout
+  const readout = document.getElementById('readout');
+  readout.style.color = color;
+  readout.textContent = abs < 20 ? 'Perfect!' : Math.round(abs) + 'ms ' + (ms < 0 ? 'early' : 'late');
+
+  // History
+  history.push({ ms, color });
+  if (history.length > HIST) history.shift();
+  renderHistory();
+  renderAccuracy();
+}
+
+function renderHistory() {
+  const dots = document.querySelectorAll('.h-dot');
+  dots.forEach((d, i) => {
+    const hIdx = history.length - HIST + i;
+    d.style.background = (hIdx >= 0 && hIdx < history.length) ? history[hIdx].color : '#1a1a1a';
+  });
+}
+
+function renderAccuracy() {
+  if (!history.length) return;
+  const good = history.filter(h => Math.abs(h.ms) < 50).length;
+  const pct  = Math.round(good / history.length * 100);
+  document.getElementById('accTxt').textContent =
+    `Accuracy: ${pct}% within ±50ms · last ${history.length} strum${history.length !== 1 ? 's' : ''}`;
+}
+
+// ── Pattern UI ────────────────────────────────────────
+function buildPatternPills() {
+  const el = document.getElementById('patternPills');
+  PATTERNS.forEach((p, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'ppill' + (i === 0 ? ' active' : '');
+    btn.textContent = p.name;
+    btn.onclick = () => selectPattern(i);
+    el.appendChild(btn);
+  });
+}
+
+function selectPattern(i) {
+  patIdx = i;
+  document.querySelectorAll('.ppill').forEach((b, j) => b.classList.toggle('active', j === i));
+  buildPatternGrid();
+}
+
+function buildPatternGrid() {
+  const grid = document.getElementById('pgrid');
+  grid.innerHTML = '';
+  const labels = ['1','&','2','&','3','&','4','&'];
+  const strums  = PATTERNS[patIdx].strums;
+
+  labels.forEach(l => {
+    const d = document.createElement('div');
+    d.className = 'pgrid-lbl';
+    d.textContent = l;
+    grid.appendChild(d);
+  });
+  strums.forEach((s, i) => {
+    const d = document.createElement('div');
+    d.className = 'pgrid-cell' + (s ? ' strum' : '');
+    d.id = 'gc' + i;
+    d.textContent = s || '';
+    grid.appendChild(d);
+  });
+}
+
+// ── Settings wiring ───────────────────────────────────
+document.getElementById('sensitivitySlider').oninput = function() {
+  document.getElementById('sensitivityVal').textContent = (+this.value).toFixed(2);
+};
+document.getElementById('latencySlider').oninput = function() {
+  document.getElementById('latencyVal').textContent = this.value + 'ms';
+};
+
+// ── Init ──────────────────────────────────────────────
+(function init() {
+  const strip = document.getElementById('histStrip');
+  for (let i = 0; i < HIST; i++) {
+    const d = document.createElement('div');
+    d.className = 'h-dot';
+    strip.appendChild(d);
+  }
+  buildPatternPills();
+  buildPatternGrid();
+})();
+</script>
+</body>
+</html>
