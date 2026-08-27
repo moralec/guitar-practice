@@ -229,6 +229,7 @@
   .chord-bar-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; margin-bottom: 4px; }
   .chord-bar { display: flex; gap: 2px; height: 30px; }
   .chord-bar:last-child:nth-child(odd) { grid-column: span 2; }
+  .chord-bar-wide { grid-column: span 2; display: flex; align-items: center; justify-content: center; height: 30px; border-radius: 4px; border: 1px solid; font-size: 11px; font-weight: 700; }
   .chord-cell { display: flex; align-items: center; justify-content: center; border-radius: 4px; border: 1px solid; font-size: 11px; font-weight: 700; min-width: 0; overflow: hidden; }
   /* Song order chips */
   .song-order-strip { margin-bottom: 18px; }
@@ -847,18 +848,34 @@ function buildChordSVG(name, data) {
 const CHORD_PALETTE = ['#60a5fa','#4ade80','#f87171','#fbbf24','#c084fc','#34d399','#fb923c'];
 
 function buildBarGrid(bars, colors) {
-  return bars.map(bar => {
-    let cells = '', i = 0;
-    while (i < bar.length) {
-      const chord = bar[i];
-      let span = 1;
-      while (i + span < bar.length && bar[i + span] === chord) span++;
+  const items = [];
+  let i = 0;
+  while (i < bars.length) {
+    const bar = bars[i];
+    const chord = bar[0];
+    const uniform = bar.every(b => b === chord);
+    const next = bars[i + 1];
+    const nextUniform = next && next.every(b => b === next[0]);
+    if (uniform && nextUniform && next[0] === chord) {
+      // Two consecutive identical bars → one wide cell
       const col = colors[chord] || '#888';
-      cells += `<div class="chord-cell" style="flex:${span};background:${col}18;border-color:${col}50;color:${col}">${chord}</div>`;
-      i += span;
+      items.push(`<div class="chord-bar-wide" style="background:${col}18;border-color:${col}50;color:${col}">${chord}</div>`);
+      i += 2;
+    } else {
+      let cells = '', j = 0;
+      while (j < bar.length) {
+        const c = bar[j];
+        let span = 1;
+        while (j + span < bar.length && bar[j + span] === c) span++;
+        const col = colors[c] || '#888';
+        cells += `<div class="chord-cell" style="flex:${span};background:${col}18;border-color:${col}50;color:${col}">${c}</div>`;
+        j += span;
+      }
+      items.push(`<div class="chord-bar">${cells}</div>`);
+      i++;
     }
-    return `<div class="chord-bar">${cells}</div>`;
-  }).join('');
+  }
+  return items.join('');
 }
 
 function highlightSection(key) {
