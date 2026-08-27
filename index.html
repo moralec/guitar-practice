@@ -516,17 +516,78 @@ const TRACKS = {
         ]}
       },
       2: {
-        title: "Knockin' on Heaven's Door", artist: "Guns N' Roses", year: 1990, bpm: 72, key: "G major",
-        backing: { kick: [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], snare: [1,0,0,0, 1,0,0,1, 0,1,0,0, 1,1,1,1] },
+        title: "Knockin' on Heaven's Door", artist: "Guns N' Roses", year: 1990, bpm: 64, key: "G major", defaultPitch: 1,
+        backing: { kick: [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], snare: [1,0,0,0, 1,0,1,1, 1,0,0,0, 1,0,1,1] },
         warmup: { videoId: "CjM5fyXoV8w", label: "Strumming Patterns · YouTube", title: "Strumming Patterns", meta: "This song lives and dies on feel and rhythm · lock in your strum before you play a chord" },
         lesson: { videoId: "mMnla7_Ipr4", label: "Marty Music · YouTube" },
         links: [
           { label: "🎸 Tab",    url: "https://tabs.ultimate-guitar.com/tab/guns-n-roses/knockin-on-heavens-door-tabs-63863" },
           { label: "🎵 Chords", url: "https://tabs.ultimate-guitar.com/tab/guns-n-roses/knockin-on-heavens-door-chords-1417585" },
         ],
-        chords: { structure: [
-          { label: "Verse 1", prog: ["G","D","Am"] },
-          { label: "Verse 2", prog: ["G","D","C"] },
+        chords: { grid: [
+          { section: "Intro", bars: [
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+          ]},
+          { section: "Verse 1", bars: [
+            ["G","G","G","G"], ["D","D","D","D"], ["Am","Am","Am","Am"],
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+            ["G","G","G","G"], ["D","D","D","D"], ["Am","Am","Am","Am"],
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+          ]},
+          { section: "Chorus", bars: [
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+          ]},
+          { section: "Solo 1", bars: [
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+          ]},
+          { section: "Verse 2", bars: [
+            ["G","G","G","G"], ["D","D","D","D"], ["Am","Am","Am","Am"],
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+            ["G","G","G","G"], ["D","D","D","D"], ["Am","Am","Am","Am"],
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+          ]},
+          { section: "Chorus", bars: [
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+          ]},
+          { section: "Solo 2", bars: [
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+          ]},
+          { section: "Outro Chorus", bars: [
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+          ]},
+          { section: "Outro", bars: [
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+          ]},
         ]}
       },
       3: { title: "Smoke on the Water", artist: "Deep Purple", year: 1972, bpm: 112, key: "G minor", coming: true, backing: STUB },
