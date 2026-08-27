@@ -536,31 +536,19 @@ const TRACKS = {
         ],
         chords: {
           sections: {
-            intro:   { label: "Intro", bars: [
+            gdc:   { label: "G · D · C", bars: [
               ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
               ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
               ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
               ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
             ]},
-            verse:   { label: "Verse", bars: [
+            verse: { label: "Verse", bars: [
               ["G","G","G","G"], ["D","D","D","D"], ["Am","Am","Am","Am"],
               ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
               ["G","G","G","G"], ["D","D","D","D"], ["Am","Am","Am","Am"],
               ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
             ]},
-            chorus:  { label: "Chorus", bars: [
-              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-            ]},
-            solo1:   { label: "Solo 1", bars: [
-              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-            ]},
-            solo2:   { label: "Solo 2", bars: [
+            long:  { label: "G · D · C (×8)", bars: [
               ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
               ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
               ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
@@ -570,17 +558,7 @@ const TRACKS = {
               ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
               ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
             ]},
-            oChorus: { label: "Outro Chorus", bars: [
-              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-            ]},
-            outro:   { label: "Outro", bars: [
+            outro: { label: "Outro", bars: [
               ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
               ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
               ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
@@ -589,15 +567,15 @@ const TRACKS = {
             ]},
           },
           sequence: [
-            { key: "intro",   label: "Intro" },
-            { key: "verse",   label: "Verse 1" },
-            { key: "chorus",  label: "Chorus" },
-            { key: "solo1",   label: "Solo 1" },
-            { key: "verse",   label: "Verse 2" },
-            { key: "chorus",  label: "Chorus" },
-            { key: "solo2",   label: "Solo 2" },
-            { key: "oChorus", label: "Outro Chorus" },
-            { key: "outro",   label: "Outro" },
+            { key: "gdc",   label: "Intro" },
+            { key: "verse", label: "Verse 1" },
+            { key: "gdc",   label: "Chorus" },
+            { key: "gdc",   label: "Solo 1" },
+            { key: "verse", label: "Verse 2" },
+            { key: "gdc",   label: "Chorus" },
+            { key: "long",  label: "Solo 2" },
+            { key: "long",  label: "Outro Chorus" },
+            { key: "outro", label: "Outro" },
           ],
         }
       },
@@ -932,11 +910,11 @@ function renderChordSection(s) {
       const shape = CHORD_SHAPES[name]; return shape ? buildChordSVG(name, shape) : '';
     }).join('')}</div>`;
 
-    // Build "used in" map
+    // Build "used in" map (deduplicated)
     const usedIn = {};
     data.sequence.forEach(item => {
-      if (!usedIn[item.key]) usedIn[item.key] = [];
-      usedIn[item.key].push(item.label);
+      if (!usedIn[item.key]) usedIn[item.key] = new Set();
+      usedIn[item.key].add(item.label);
     });
 
     // Song order strip
@@ -947,7 +925,7 @@ function renderChordSection(s) {
 
     // Unique section grids
     const grids = Object.entries(data.sections).map(([key, sec]) => {
-      const uses = usedIn[key] || [];
+      const uses = [...(usedIn[key] || [])];
       const note = uses.length > 1 ? `<span class="section-used-in">${uses.join(' · ')}</span>` : '';
       return `<div class="chord-section-block" id="csec-${key}">` +
         `<div class="chord-section-header">${sec.label}${note}</div>` +
