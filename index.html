@@ -780,7 +780,7 @@ function setThumb(elId, videoId, label) {
     `<div class="yt-overlay"><div class="yt-play-circle">▶</div><span class="yt-label">${label}</span></div>`;
   el.onclick = function(e) {
     e.preventDefault();
-    this.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0"
+    this.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0"
       allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen
       style="position:absolute;inset:0;width:100%;height:100%;border:0;border-radius:9px;"></iframe>`;
     this.onclick = null;
