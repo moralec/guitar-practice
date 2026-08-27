@@ -1314,15 +1314,30 @@ function highlightBtStep(step) {
 
 function playKick(time, vol) {
   const ctx = getCtx();
-  const osc  = ctx.createOscillator();
-  const gain = ctx.createGain();
-  osc.connect(gain); gain.connect(ctx.destination);
+  // Sine body: 800→600 Hz, 80ms — warm wood tap
+  const osc = ctx.createOscillator();
+  const oGain = ctx.createGain();
   osc.type = 'sine';
-  osc.frequency.setValueAtTime(180, time);
-  osc.frequency.exponentialRampToValueAtTime(42, time + 0.25);
-  gain.gain.setValueAtTime(vol, time);
-  gain.gain.exponentialRampToValueAtTime(0.001, time + 0.55);
-  osc.start(time); osc.stop(time + 0.6);
+  osc.frequency.setValueAtTime(800, time);
+  osc.frequency.exponentialRampToValueAtTime(600, time + 0.08);
+  oGain.gain.setValueAtTime(vol, time);
+  oGain.gain.exponentialRampToValueAtTime(0.001, time + 0.08);
+  osc.connect(oGain); oGain.connect(ctx.destination);
+  osc.start(time); osc.stop(time + 0.09);
+  // Noise attack: bandpass around 1200 Hz for texture
+  const bufLen = Math.round(ctx.sampleRate * 0.04);
+  const buf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < bufLen; i++) d[i] = Math.random() * 2 - 1;
+  const noise = ctx.createBufferSource();
+  noise.buffer = buf;
+  const bpf = ctx.createBiquadFilter();
+  bpf.type = 'bandpass'; bpf.frequency.value = 1200; bpf.Q.value = 0.5;
+  const nGain = ctx.createGain();
+  nGain.gain.setValueAtTime(vol * 0.3, time);
+  nGain.gain.exponentialRampToValueAtTime(0.001, time + 0.03);
+  noise.connect(bpf); bpf.connect(nGain); nGain.connect(ctx.destination);
+  noise.start(time); noise.stop(time + 0.04);
 }
 
 function playSnare(time, vol) {
