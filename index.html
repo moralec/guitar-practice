@@ -240,6 +240,10 @@
   .chord-section-block { border-radius: 6px; padding: 4px; margin: 0 -4px; transition: background 0.2s; }
   .chord-section-block.highlighted { background: #ffffff07; }
   .section-used-in { font-size: 9px; font-weight: 500; color: #3a3a3a; text-transform: none; letter-spacing: 0; margin-left: 8px; }
+  .section-badge { display: inline-flex; align-items: center; border-radius: 4px; padding: 1px 6px; font-size: 9px; font-weight: 700; margin-left: 5px; text-transform: none; letter-spacing: 0; }
+  .bar-repeat-wrap { display: flex; align-items: flex-start; gap: 10px; }
+  .bar-repeat-wrap .chord-bar-grid { flex: 1; }
+  .bar-repeat { font-size: 13px; font-weight: 700; color: #444; align-self: center; white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -910,26 +914,54 @@ function renderChordSection(s) {
       const shape = CHORD_SHAPES[name]; return shape ? buildChordSVG(name, shape) : '';
     }).join('')}</div>`;
 
-    // Build "used in" map (deduplicated)
+    // Assign a color per unique section key
+    const SEC_COLORS = ['#60a5fa','#4ade80','#f87171','#c084fc','#fb923c','#34d399','#fbbf24'];
+    const secColor = {};
+    Object.keys(data.sections).forEach((k, i) => { secColor[k] = SEC_COLORS[i % SEC_COLORS.length]; });
+
+    // Build "used in" map (deduplicated, preserving order)
     const usedIn = {};
     data.sequence.forEach(item => {
       if (!usedIn[item.key]) usedIn[item.key] = new Set();
       usedIn[item.key].add(item.label);
     });
 
-    // Song order strip
-    const chips = data.sequence.map(item =>
-      `<button class="song-chip" data-key="${item.key}" onclick="highlightSection('${item.key}')">${item.label}</button>`
-    ).join('');
+    // Detect smallest repeating unit within a bar array
+    function detectRepeat(bars) {
+      const n = bars.length;
+      for (let p = 1; p <= Math.floor(n / 2); p++) {
+        if (n % p !== 0) continue;
+        let ok = true;
+        for (let i = p; i < n; i++) {
+          if (bars[i].join(',') !== bars[i % p].join(',')) { ok = false; break; }
+        }
+        if (ok) return { unit: bars.slice(0, p), count: n / p };
+      }
+      return { unit: bars, count: 1 };
+    }
+
+    // Song order strip (chips colored by section type)
+    const chips = data.sequence.map(item => {
+      const col = secColor[item.key];
+      return `<button class="song-chip" data-key="${item.key}" onclick="highlightSection('${item.key}')" style="border-color:${col}50;color:${col};background:${col}12">${item.label}</button>`;
+    }).join('');
     const strip = `<div class="song-order-strip"><div class="song-order-title">Song Order</div><div class="song-order-chips">${chips}</div></div>`;
 
     // Unique section grids
     const grids = Object.entries(data.sections).map(([key, sec]) => {
+      const col = secColor[key];
       const uses = [...(usedIn[key] || [])];
-      const note = uses.length > 1 ? `<span class="section-used-in">${uses.join(' · ')}</span>` : '';
+      const badges = uses.map(u =>
+        `<span class="section-badge" style="background:${col}18;border:1px solid ${col}40;color:${col}">${u}</span>`
+      ).join('');
+      const { unit, count } = detectRepeat(sec.bars);
+      const gridHtml = `<div class="chord-bar-grid">${buildBarGrid(unit, colors)}</div>`;
+      const inner = count > 1
+        ? `<div class="bar-repeat-wrap">${gridHtml}<span class="bar-repeat">×${count}</span></div>`
+        : gridHtml;
       return `<div class="chord-section-block" id="csec-${key}">` +
-        `<div class="chord-section-header">${sec.label}${note}</div>` +
-        `<div class="chord-bar-grid">${buildBarGrid(sec.bars, colors)}</div></div>`;
+        `<div class="chord-section-header" style="color:${col}">${sec.label}${badges}</div>` +
+        inner + `</div>`;
     }).join('');
 
     gridEl.innerHTML = strip + grids;
