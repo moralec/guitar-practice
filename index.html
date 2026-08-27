@@ -304,7 +304,7 @@
     <div class="step-body">
       <div class="step-label">Strumming Pattern · 5 min</div>
       <div class="step-title">Strumming Pattern</div>
-      <div class="step-meta">Kick = pulse · snare = strumming pattern · lock in the rhythm before adding chords</div>
+      <div class="step-meta">Beat = pulse · Strum = strumming pattern · lock in the rhythm before adding chords</div>
       <div class="card">
         <div class="bt-grid" id="btGrid"></div>
         <div class="ctrl-row" style="margin-top:14px">
@@ -1372,8 +1372,8 @@ function renderBtGrid() {
   if (!backing) return;
 
   const tracks = [
-    { name: 'Kick',  data: backing.kick,  cls: 'kick-on' },
-    { name: 'Snare', data: backing.snare, cls: 'snare-on' },
+    { name: 'Beat',  data: backing.kick,  cls: 'kick-on' },
+    { name: 'Strum', data: backing.snare, cls: 'snare-on' },
   ];
 
   tracks.forEach(({ name, data, cls }) => {
