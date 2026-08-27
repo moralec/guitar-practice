@@ -310,10 +310,17 @@
         <div class="ctrl-row" style="margin-top:14px">
           <button class="btn-play" id="btBtn" onclick="toggleBacking()">▶ Play</button>
           <button class="btn-stop" onclick="stopBacking()">■ Stop</button>
-          <div class="speed-row" style="flex:1;margin-left:12px">
-            <span>Volume</span>
-            <input type="range" id="btVol" min="0" max="100" value="75" oninput="document.getElementById('btVolVal').textContent=this.value+'%'">
-            <span class="speed-val" id="btVolVal">75%</span>
+          <div style="flex:1;margin-left:12px;display:flex;flex-direction:column;gap:6px">
+            <div class="speed-row">
+              <span>BPM</span>
+              <input type="range" id="btBpm" min="30" max="200" value="88" oninput="document.getElementById('btBpmVal').textContent=this.value">
+              <span class="speed-val" id="btBpmVal">88</span>
+            </div>
+            <div class="speed-row">
+              <span>Volume</span>
+              <input type="range" id="btVol" min="0" max="100" value="75" oninput="document.getElementById('btVolVal').textContent=this.value+'%'">
+              <span class="speed-val" id="btVolVal">75%</span>
+            </div>
           </div>
         </div>
       </div>
@@ -975,6 +982,8 @@ function renderSession(s) {
   document.getElementById('hArtist').textContent = s.artist + ' · ' + s.year;
   document.getElementById('hBpm').textContent    = s.bpm;
   document.getElementById('hKey').textContent    = s.key;
+  document.getElementById('btBpm').value         = s.bpm;
+  document.getElementById('btBpmVal').textContent = s.bpm;
 
   const coming = !!s.coming;
   document.getElementById('stepsSection').style.display = coming ? 'none' : '';
@@ -1277,10 +1286,11 @@ function stopBacking() {
 
 function runBtSched() {
   const ctx = getCtx();
-  const { bpm, backing } = currentSession();
+  const { backing } = currentSession();
   if (!backing) return;
   const { kick, snare } = backing;
   const steps = kick.length;
+  const bpm = parseInt(document.getElementById('btBpm').value);
   const stepDur = 60 / bpm / 4;
   const vol = parseInt(document.getElementById('btVol').value) / 100;
 
