@@ -1026,7 +1026,7 @@ async function loadST() {
   return stModule;
 }
 
-function getCtx() { if (!actx) actx = new AC(); return actx; }
+function getCtx() { if (!actx) actx = new AC(); if (actx.state === 'suspended') actx.resume(); return actx; }
 function parseTime(s) {
   const p = s.trim().split(':');
   return p.length === 2 ? parseFloat(p[0]) * 60 + parseFloat(p[1]) : parseFloat(p[0]) || 0;
