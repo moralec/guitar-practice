@@ -230,6 +230,16 @@
   .chord-bar { display: flex; gap: 2px; height: 30px; }
   .chord-bar:last-child:nth-child(odd) { grid-column: span 2; }
   .chord-cell { display: flex; align-items: center; justify-content: center; border-radius: 4px; border: 1px solid; font-size: 11px; font-weight: 700; min-width: 0; overflow: hidden; }
+  /* Song order chips */
+  .song-order-strip { margin-bottom: 18px; }
+  .song-order-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #555; margin-bottom: 8px; }
+  .song-order-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .song-chip { background: #141414; border: 1px solid #2a2a2a; border-radius: 6px; color: #555; font-size: 11px; font-weight: 700; padding: 5px 10px; cursor: pointer; transition: all 0.12s; }
+  .song-chip:hover { border-color: #444; color: #aaa; }
+  .song-chip.active { background: rgba(245,166,35,0.12); border-color: #f5a623; color: #f5a623; }
+  .chord-section-block { border-radius: 6px; padding: 4px; margin: 0 -4px; transition: background 0.2s; }
+  .chord-section-block.highlighted { background: #ffffff07; }
+  .section-used-in { font-size: 9px; font-weight: 500; color: #3a3a3a; text-transform: none; letter-spacing: 0; margin-left: 8px; }
 </style>
 </head>
 <body>
@@ -517,78 +527,79 @@ const TRACKS = {
       },
       2: {
         title: "Knockin' on Heaven's Door", artist: "Guns N' Roses", year: 1990, bpm: 64, key: "G major", defaultPitch: 1,
-        backing: { kick: [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], snare: [1,0,0,0, 1,0,1,1, 1,0,0,0, 1,0,1,1] },
+        backing: { kick: [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], snare: [1,0,0,0, 1,0,1,1, 1,0,0,0, 1,0,1,1] },
         warmup: { videoId: "CjM5fyXoV8w", label: "Strumming Patterns · YouTube", title: "Strumming Patterns", meta: "This song lives and dies on feel and rhythm · lock in your strum before you play a chord" },
         lesson: { videoId: "mMnla7_Ipr4", label: "Marty Music · YouTube" },
         links: [
           { label: "🎸 Tab",    url: "https://tabs.ultimate-guitar.com/tab/guns-n-roses/knockin-on-heavens-door-tabs-63863" },
           { label: "🎵 Chords", url: "https://tabs.ultimate-guitar.com/tab/guns-n-roses/knockin-on-heavens-door-chords-1417585" },
         ],
-        chords: { grid: [
-          { section: "Intro", bars: [
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-          ]},
-          { section: "Verse 1", bars: [
-            ["G","G","G","G"], ["D","D","D","D"], ["Am","Am","Am","Am"],
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-            ["G","G","G","G"], ["D","D","D","D"], ["Am","Am","Am","Am"],
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-          ]},
-          { section: "Chorus", bars: [
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-          ]},
-          { section: "Solo 1", bars: [
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-          ]},
-          { section: "Verse 2", bars: [
-            ["G","G","G","G"], ["D","D","D","D"], ["Am","Am","Am","Am"],
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-            ["G","G","G","G"], ["D","D","D","D"], ["Am","Am","Am","Am"],
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-          ]},
-          { section: "Chorus", bars: [
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-          ]},
-          { section: "Solo 2", bars: [
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-          ]},
-          { section: "Outro Chorus", bars: [
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-          ]},
-          { section: "Outro", bars: [
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-            ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
-          ]},
-        ]}
+        chords: {
+          sections: {
+            intro:   { label: "Intro", bars: [
+              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+            ]},
+            verse:   { label: "Verse", bars: [
+              ["G","G","G","G"], ["D","D","D","D"], ["Am","Am","Am","Am"],
+              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+              ["G","G","G","G"], ["D","D","D","D"], ["Am","Am","Am","Am"],
+              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+            ]},
+            chorus:  { label: "Chorus", bars: [
+              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+            ]},
+            solo1:   { label: "Solo 1", bars: [
+              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+            ]},
+            solo2:   { label: "Solo 2", bars: [
+              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+            ]},
+            oChorus: { label: "Outro Chorus", bars: [
+              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+            ]},
+            outro:   { label: "Outro", bars: [
+              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+              ["G","G","G","G"], ["D","D","D","D"], ["C","C","C","C"],
+            ]},
+          },
+          sequence: [
+            { key: "intro",   label: "Intro" },
+            { key: "verse",   label: "Verse 1" },
+            { key: "chorus",  label: "Chorus" },
+            { key: "solo1",   label: "Solo 1" },
+            { key: "verse",   label: "Verse 2" },
+            { key: "chorus",  label: "Chorus" },
+            { key: "solo2",   label: "Solo 2" },
+            { key: "oChorus", label: "Outro Chorus" },
+            { key: "outro",   label: "Outro" },
+          ],
+        }
       },
       3: { title: "Smoke on the Water", artist: "Deep Purple", year: 1972, bpm: 112, key: "G minor", coming: true, backing: STUB },
       4: { title: "With or Without You", artist: "U2", year: 1987, bpm: 80, key: "D major", coming: true, backing: STUB },
@@ -878,53 +889,94 @@ function buildChordSVG(name, data) {
 // ── Chord section renderer ─────────────────────────────
 const CHORD_PALETTE = ['#60a5fa','#4ade80','#f87171','#fbbf24','#c084fc','#34d399','#fb923c'];
 
+function buildBarGrid(bars, colors) {
+  return bars.map(bar => {
+    let cells = '', i = 0;
+    while (i < bar.length) {
+      const chord = bar[i];
+      let span = 1;
+      while (i + span < bar.length && bar[i + span] === chord) span++;
+      const col = colors[chord] || '#888';
+      cells += `<div class="chord-cell" style="flex:${span};background:${col}18;border-color:${col}50;color:${col}">${chord}</div>`;
+      i += span;
+    }
+    return `<div class="chord-bar">${cells}</div>`;
+  }).join('');
+}
+
+function highlightSection(key) {
+  document.querySelectorAll('.song-chip').forEach(c =>
+    c.classList.toggle('active', c.dataset.key === key));
+  document.querySelectorAll('.chord-section-block').forEach(b =>
+    b.classList.toggle('highlighted', b.id === 'csec-' + key));
+  const el = document.getElementById('csec-' + key);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
 function renderChordSection(s) {
   const diagEl = document.getElementById('chordDiagrams');
   const gridEl = document.getElementById('chordGrid');
 
-  if (!s.chords) {
-    diagEl.innerHTML = ''; gridEl.innerHTML = '';
-    return;
-  }
+  if (!s.chords) { diagEl.innerHTML = ''; gridEl.innerHTML = ''; return; }
   const data = s.chords;
 
-  // Collect unique chords in appearance order
+  // ── New format: sections + sequence ──
+  if (data.sections && data.sequence) {
+    const allChords = Object.values(data.sections).flatMap(sec => sec.bars.flat());
+    const seen = new Set(), unique = [];
+    allChords.forEach(c => { if (c && !seen.has(c)) { seen.add(c); unique.push(c); } });
+    const colors = {};
+    unique.forEach((c, i) => { colors[c] = CHORD_PALETTE[i % CHORD_PALETTE.length]; });
+
+    diagEl.innerHTML = `<div class="chord-diagrams">${unique.map(name => {
+      const shape = CHORD_SHAPES[name]; return shape ? buildChordSVG(name, shape) : '';
+    }).join('')}</div>`;
+
+    // Build "used in" map
+    const usedIn = {};
+    data.sequence.forEach(item => {
+      if (!usedIn[item.key]) usedIn[item.key] = [];
+      usedIn[item.key].push(item.label);
+    });
+
+    // Song order strip
+    const chips = data.sequence.map(item =>
+      `<button class="song-chip" data-key="${item.key}" onclick="highlightSection('${item.key}')">${item.label}</button>`
+    ).join('');
+    const strip = `<div class="song-order-strip"><div class="song-order-title">Song Order</div><div class="song-order-chips">${chips}</div></div>`;
+
+    // Unique section grids
+    const grids = Object.entries(data.sections).map(([key, sec]) => {
+      const uses = usedIn[key] || [];
+      const note = uses.length > 1 ? `<span class="section-used-in">${uses.join(' · ')}</span>` : '';
+      return `<div class="chord-section-block" id="csec-${key}">` +
+        `<div class="chord-section-header">${sec.label}${note}</div>` +
+        `<div class="chord-bar-grid">${buildBarGrid(sec.bars, colors)}</div></div>`;
+    }).join('');
+
+    gridEl.innerHTML = strip + grids;
+    return;
+  }
+
+  // ── Legacy formats ──
   const allChords = data.grid
     ? data.grid.flatMap(sec => sec.bars.flat())
     : data.structure.flatMap(row => row.prog);
   const seen = new Set(), unique = [];
   allChords.forEach(c => { if (c && !seen.has(c)) { seen.add(c); unique.push(c); } });
-
-  // Assign a color to each unique chord
   const colors = {};
   unique.forEach((c, i) => { colors[c] = CHORD_PALETTE[i % CHORD_PALETTE.length]; });
 
-  // 1. Chord diagrams
-  const diagrams = unique.map(name => {
-    const shape = CHORD_SHAPES[name];
-    return shape ? buildChordSVG(name, shape) : '';
-  }).join('');
-  diagEl.innerHTML = `<div class="chord-diagrams">${diagrams}</div>`;
+  diagEl.innerHTML = `<div class="chord-diagrams">${unique.map(name => {
+    const shape = CHORD_SHAPES[name]; return shape ? buildChordSVG(name, shape) : '';
+  }).join('')}</div>`;
 
-  // 2. Chord section grid (below the strumming pattern)
   let body = '';
   if (data.grid) {
-    body = data.grid.map(sec => {
-      const hdr = `<div class="chord-section-header">${sec.section}</div>`;
-      const rows = sec.bars.map(bar => {
-        let cells = '', i = 0;
-        while (i < bar.length) {
-          const chord = bar[i];
-          let span = 1;
-          while (i + span < bar.length && bar[i + span] === chord) span++;
-          const col = colors[chord] || '#888';
-          cells += `<div class="chord-cell" style="flex:${span};background:${col}18;border-color:${col}50;color:${col}">${chord}</div>`;
-          i += span;
-        }
-        return `<div class="chord-bar">${cells}</div>`;
-      }).join('');
-      return hdr + `<div class="chord-bar-grid">${rows}</div>`;
-    }).join('');
+    body = data.grid.map(sec =>
+      `<div class="chord-section-header">${sec.section}</div>` +
+      `<div class="chord-bar-grid">${buildBarGrid(sec.bars, colors)}</div>`
+    ).join('');
   } else {
     body = '<div class="chord-structure">' +
       data.structure.map(row =>
