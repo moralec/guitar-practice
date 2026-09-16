@@ -33,6 +33,8 @@ Decisions that constrain new code, corrections received, gotchas. Rewritten as s
 
 ## Gotchas
 
+- Web Audio: `source.stop()` fires `onended` just like a natural end. Any restart-while-playing (speed, pitch, markers, Pause) therefore reset the player and orphaned a looping source that Stop could not reach. `stopSrc()` now detaches the handler first and `playGen` guards the async `startSrc()`. Test the pitch-at-Original path as well as the SoundTouch one; the built songs default to +1, so the plain path is easy to miss. (2026-09-16, log: stop-buttons)
+
 - `logs/` and every committed file are deployed by Netlify — the repo root is the publish directory.
 - `songs.md` carries an uncommitted edit from before 2026-09-16; not mine to commit.
 - `CLAUDE.md` is a symlink to `AGENTS.md`; edit `AGENTS.md`.

@@ -1175,6 +1175,7 @@ let startCtxTime = 0, startOffset = 0;
 let pitchSemitones = 0;
 let shifter = null;
 let stModule = null;
+let playGen = 0;   // bumped by every stopSrc(); a startSrc() that awaited across a bump must not start
 
 async function loadST() {
   if (!stModule) {
@@ -1290,8 +1291,10 @@ function seekTo(e) {
 }
 
 async function startSrc() {
+  const gen = playGen;
   if (pitchSemitones !== 0) {
     const mod = await loadST();
+    if (gen !== playGen) return;   // stopped or restarted while the library was loading
     if (mod) { startSrcWithPitch(mod.PitchShifter); return; }
   }
   startSrcDirect();
@@ -1317,7 +1320,8 @@ function startSrcDirect() {
   startCtxTime = ctx.currentTime;
   startOffset = from;
   isPlaying = true;
-  source.onended = onEnded;
+  const mine = source;
+  source.onended = () => { if (source === mine) onEnded(); };
   document.getElementById('playBtn').textContent = '⏸ Pause';
   document.getElementById('dot').classList.add('on');
   tick();
@@ -1329,7 +1333,9 @@ function startSrcWithPitch(PitchShifter) {
   const from = Math.max(0, Math.min(startOffset, audioBuffer.duration - 0.05));
   const pct  = (from / audioBuffer.duration) * 100;
 
+  let mine = null;
   const handleEnd = () => {
+    if (shifter !== mine) return;   // stale shifter, already stopped
     if (mode === 'loop' && shifter) {
       shifter.percentagePlayed = (getA() / audioBuffer.duration) * 100;
     } else {
@@ -1337,7 +1343,7 @@ function startSrcWithPitch(PitchShifter) {
     }
   };
 
-  shifter = new PitchShifter(ctx, audioBuffer, 4096, handleEnd);
+  shifter = mine = new PitchShifter(ctx, audioBuffer, 4096, handleEnd);
   shifter.pitchSemitones = pitchSemitones;
   shifter.tempo = getSpeed();
   shifter.percentagePlayed = pct;
@@ -1352,8 +1358,9 @@ function startSrcWithPitch(PitchShifter) {
 }
 
 function stopSrc() {
-  if (source) { try { source.stop(); } catch(e){} source = null; }
-  if (shifter) { try { shifter.disconnect(); } catch(e){} shifter = null; }
+  playGen++;
+  if (source) { const s = source; source = null; s.onended = null; try { s.stop(); } catch(e){} }
+  if (shifter) { const sh = shifter; shifter = null; try { sh.disconnect(); } catch(e){} }
   cancelAnimationFrame(animFrame);
 }
 
