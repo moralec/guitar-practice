@@ -1,29 +1,36 @@
-# 2026-09-16 — Guitar / Guitarlele instrument toggle
+# 2026-09-16 — Guitarlele instrument toggle; join the Memory Palace
 
-**Trigger:** Carlos got a guitarlele and wanted the app to support it.
+## Goal
 
-## Decision
+Carlos got a guitarlele and wants the app to work for it. Later in the session: make the project a Memory Palace member.
 
-Three options were considered: (1) transpose the displayed chord shapes a 4th down, (2) pitch-shift the play-along track +5 semitones, (3) a dedicated guitarlele track. Carlos chose (1). The player already has a pitch slider, so (2) was left untouched by design.
+## Done
 
-## What was built (commit d62f7b5)
+- `index.html` — header toggle Guitar / Guitarlele (`buildInstrumentToggle`, `setInstrument`), persisted as `guitarInstrument`; `chordsForInstrument()` / `transposeChord()` / `keyForInstrument()`; header `Guitarlele shapes:` span; Step 4 meta text; eight counterpart shapes (Dm, Bm7, Gadd9, Asus4, A/C#, F#7, C#, G#m). Commit d62f7b5, live at https://guitar.ag-insights.co.uk about 20 s after push.
+- `AGENTS.md` — rewritten front door (5 steps, 3 tracks, current session format); `CLAUDE.md` now a symlink to it.
+- `.palace` — adopted as `local-tool` / `personal`, alias `guitar-practice`.
+- `MEMORY.md`, `BACKLOG.md`, `logs/INDEX.md` — created.
+- Message appended to the Palace's `INBOX.md` asking for the registry row to be completed.
 
-- Header toggle `Guitar / Guitarlele`, persisted in localStorage as `guitarInstrument`, default Guitar.
-- `chordsForInstrument()` transposes every chord name 5 semitones down before `renderChordSection()` runs, so both the Step 4 diagrams and the Step 5 song map follow the instrument.
-- `transposeChord()` handles root, suffix and slash bass; spelling picks whichever of default/sharp/flat exists in `CHORD_SHAPES`.
-- Header shows `Guitarlele shapes: <key>` beside the song key; Step 4 meta text explains the shapes differ from the lesson video.
-- Added counterpart shapes so every library chord has one a 4th down: Dm, Bm7, Gadd9, Asus4, A/C#, F#7, C#, G#m.
-- CLAUDE.md gained an "Instrument toggle" section.
+## Decisions
+
+- Transpose the displayed shapes a 4th down (option 1) rather than pitch-shift the track (+5) or add a guitarlele track. Reason: correct audio, and the pitch slider already exists for anyone who prefers option 2.
+- Chord spelling follows whatever exists in `CHORD_SHAPES`; minor keys spell to the `m` chord (C# minor → G# minor).
+- Archetype `local-tool`, matching the registry row that already existed, despite the public deploy. Flagged in `BACKLOG.md` for the operator.
+- Logs are committed and pushed, so they deploy with the site. Accepted for now; exclusion is in the backlog.
+
+## Corrections
+
+- "Option 1 is best. The change of what we hear we already have in the player. Lets leave that untouched."
+- "I am not seeing anything changing in the live app" — cause was a stale tab; a hard reload fixed it. Netlify headers and served content were correct.
+- Palace membership question was asked twice before Carlos answered: "lets make it parte of memory palace."
 
 ## Verification
 
-- Node test over every chord used in all sessions: all 24 library chords transpose to a shape that exists.
-- Browser (localhost:7432 via Chrome extension; file:// is not reachable from it): toggle renders, all 10 built sessions show one diagram per transposed chord, setting survives reload, coming-soon weeks do not error, switching back restores original shapes.
-- Live site checked after Netlify deploy (~20 s after push). Carlos initially saw no change; cause was a stale tab, hard reload fixed it. Netlify serves `max-age=0, must-revalidate`, no service worker.
+- Node: every chord used across all sessions (24 library chords) transposes to an existing shape.
+- Browser via Chrome extension on `http://127.0.0.1:7432` (`file://` is refused by the extension): toggle renders, all 10 built sessions show one diagram per transposed chord, setting survives reload, coming-soon weeks do not throw, switching back restores original shapes. Repeated on the live site after deploy.
 
-## Notes for next time
+## Open
 
-- Adding a chord to `CHORD_SHAPES` means also adding its counterpart a 4th down, or the guitarlele diagram silently goes missing.
-- Awkward guitarlele transpositions: Message in a Bottle → G#m E F#; Hotel California → F#m C# E B D A Bm.
-- Memory Palace membership was asked twice and not answered; project remains out. Ask again next session.
-- `songs.md` has an uncommitted change that predates this session; left alone.
+- Palace registry row still says domain `null`; the inbox message asks for `personal`.
+- See `BACKLOG.md`: archetype confirmation, Netlify publish exclusions, silent-missing-diagram warning, pending `songs.md` edit.

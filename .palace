@@ -1,0 +1,4 @@
+name:      guitar
+domain:    personal
+archetype: local-tool
+aliases:   [guitar-practice]
