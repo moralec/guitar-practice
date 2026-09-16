@@ -64,6 +64,8 @@
     padding: 10px 16px; font-size: 13px; color: #666;
   }
   .song-meta span strong { color: #f5a623; }
+  .diff-dots { letter-spacing: 1px; color: #f5a623; font-size: 11px; }
+  .diff-dots .off { color: #333; }
 
   /* Coming soon */
   #comingSoon {
@@ -281,8 +283,8 @@
   <div class="artist" id="hArtist"></div>
   <div class="song-meta">
     <span><strong id="hBpm"></strong> BPM</span>
-    <span>Key: <strong id="hKey"></strong></span>
-    <span id="hShapes" style="display:none">Guitarlele shapes: <strong id="hShapesVal"></strong></span>
+    <span>Difficulty: <strong id="hDiff"></strong> <span class="diff-dots" id="hDiffDots"></span></span>
+    <span><span id="hKeyLabel">Key</span>: <strong id="hKey"></strong></span>
   </div>
 </header>
 
@@ -473,7 +475,7 @@ const TRACKS = {
     label: 'Beginner',
     sessions: {
       1: {
-        title: "Every Rose Has Its Thorn", artist: "Poison", year: 1988, bpm: 88, key: "G major", defaultPitch: 1,
+        title: "Every Rose Has Its Thorn", rating: { chords: 1, licks: 2, timing: 1 }, artist: "Poison", year: 1988, bpm: 88, key: "G major", defaultPitch: 1,
         backing: { kick: [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], snare: [1,0,0.4,0, 1,0,0.4,1, 0,1,0,0, 1,1,1,1] },
         warmup: { videoId: "BIsrKOXyi6U", label: "Pentatonic Scale · YouTube", title: "Pentatonic Scale", meta: "Foundation of every rock song · A minor box shape, 5th fret, slow and clean" },
         lesson: { videoId: "oYpguG4KxdQ", label: "Marty Music · YouTube" },
@@ -534,7 +536,7 @@ const TRACKS = {
         }
       },
       2: {
-        title: "Knockin' on Heaven's Door", artist: "Guns N' Roses", year: 1990, bpm: 64, key: "G major", defaultPitch: 1,
+        title: "Knockin' on Heaven's Door", rating: { chords: 1, licks: 1, timing: 1 }, artist: "Guns N' Roses", year: 1990, bpm: 64, key: "G major", defaultPitch: 1,
         backing: { kick: [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], snare: [1,0,0,0, 1,0,1,1, 1,0,0,0, 1,0,1,1] },
         warmup: { videoId: "CjM5fyXoV8w", label: "Strumming Patterns · YouTube", title: "Strumming Patterns", meta: "This song lives and dies on feel and rhythm · lock in your strum before you play a chord" },
         lesson: { videoId: "mMnla7_Ipr4", label: "Marty Music · YouTube" },
@@ -587,11 +589,11 @@ const TRACKS = {
           ],
         }
       },
-      3: { title: "Smoke on the Water", artist: "Deep Purple", year: 1972, bpm: 112, key: "G minor", coming: true, backing: STUB },
-      4: { title: "With or Without You", artist: "U2", year: 1987, bpm: 80, key: "D major", coming: true, backing: STUB },
-      5: { title: "Free Fallin'", artist: "Tom Petty", year: 1989, bpm: 85, key: "F major", coming: true, backing: STUB },
+      3: { title: "Smoke on the Water", rating: { chords: 1, licks: 2, timing: 1 }, artist: "Deep Purple", year: 1972, bpm: 112, key: "G minor", coming: true, backing: STUB },
+      4: { title: "With or Without You", rating: { chords: 1, licks: 1, timing: 2 }, artist: "U2", year: 1987, bpm: 80, key: "D major", coming: true, backing: STUB },
+      5: { title: "Free Fallin'", rating: { chords: 1, licks: 1, timing: 2 }, artist: "Tom Petty", year: 1989, bpm: 85, key: "F major", coming: true, backing: STUB },
       6: {
-        title: "Summer of '69", artist: "Bryan Adams", year: 1985, bpm: 144, key: "D major",
+        title: "Summer of '69", rating: { chords: 1, licks: 2, timing: 2 }, artist: "Bryan Adams", year: 1985, bpm: 144, key: "D major",
         backing: { kick: [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], snare: [1,0,0,0, 1,0,0,1, 0,1,0,0, 1,1,1,1] },
         warmup: { videoId: "vMt8T5Jqf10", label: "Strumming Exercise · YouTube", title: "Rhythm & Strumming", meta: "Summer of '69 is about driving energy · get the right hand loose before you hit those downstrokes" },
         lesson: { videoId: "owPLZdGkNFs", label: "JustinGuitar · YouTube" },
@@ -604,11 +606,11 @@ const TRACKS = {
           { label: "Chorus", prog: ["G","D","A"] },
         ]}
       },
-      7: { title: "Here I Go Again", artist: "Whitesnake", year: 1987, bpm: 86, key: "C major", coming: true, backing: STUB },
-      8: { title: "Wonderwall", artist: "Oasis", year: 1995, bpm: 87, key: "F# minor", coming: true, backing: STUB },
-      9: { title: "Good Riddance (Time of Your Life)", artist: "Green Day", year: 1997, bpm: 80, key: "G major", coming: true, backing: STUB },
+      7: { title: "Here I Go Again", rating: { chords: 1, licks: 2, timing: 1 }, artist: "Whitesnake", year: 1987, bpm: 86, key: "C major", coming: true, backing: STUB },
+      8: { title: "Wonderwall", rating: { chords: 2, licks: 1, timing: 2 }, artist: "Oasis", year: 1995, bpm: 87, key: "F# minor", coming: true, backing: STUB },
+      9: { title: "Good Riddance (Time of Your Life)", rating: { chords: 2, licks: 1, timing: 2 }, artist: "Green Day", year: 1997, bpm: 80, key: "G major", coming: true, backing: STUB },
       10: {
-        title: "Wish You Were Here", artist: "Pink Floyd", year: 1975, bpm: 60, key: "G major",
+        title: "Wish You Were Here", rating: { chords: 2, licks: 2, timing: 2 }, artist: "Pink Floyd", year: 1975, bpm: 60, key: "G major",
         backing: { kick: [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], snare: [1,0,0,0, 1,0,0,1, 0,1,0,0, 1,1,1,1] },
         warmup: { videoId: "4SIqf6ktnYg", label: "Fingerpicking Exercise · YouTube", title: "Fingerpicking Pattern", meta: "This song is all about the right hand · warm up the picking fingers before anything else" },
         lesson: { videoId: "IzxMeQgtyYE", label: "Marty Music · YouTube" },
@@ -627,10 +629,10 @@ const TRACKS = {
   intermediate: {
     label: 'Intermediate',
     sessions: {
-      1: { title: "Don't Stop Believin'", artist: "Journey", year: 1981, bpm: 119, key: "E major", coming: true, backing: STUB },
-      2: { title: "Patience", artist: "Guns N' Roses", year: 1988, bpm: 76, key: "G major", coming: true, backing: STUB },
+      1: { title: "Don't Stop Believin'", rating: { chords: 2, licks: 2, timing: 2 }, artist: "Journey", year: 1981, bpm: 119, key: "E major", coming: true, backing: STUB },
+      2: { title: "Patience", rating: { chords: 2, licks: 2, timing: 2 }, artist: "Guns N' Roses", year: 1988, bpm: 76, key: "G major", coming: true, backing: STUB },
       3: {
-        title: "You Give Love a Bad Name", artist: "Bon Jovi", year: 1986, bpm: 123, key: "C minor",
+        title: "You Give Love a Bad Name", rating: { chords: 2, licks: 3, timing: 2 }, artist: "Bon Jovi", year: 1986, bpm: 123, key: "C minor",
         backing: { kick: [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], snare: [1,0,0,0, 1,0,0,1, 0,1,0,0, 1,1,1,1] },
         warmup: { videoId: "AXg6T0Tq6Hs", label: "Palm Muting Guide · YouTube", title: "Palm Muting", meta: "That iconic intro punch comes entirely from palm muting · nail the technique before the riff" },
         lesson: { videoId: "pVnlPaw8Pvk", label: "Marty Music · YouTube" },
@@ -642,9 +644,9 @@ const TRACKS = {
           { label: "Verse / Chorus", prog: ["Cm","Ab","Eb","Bb"] },
         ]}
       },
-      4: { title: "Enter Sandman", artist: "Metallica", year: 1991, bpm: 123, key: "E minor", coming: true, backing: STUB },
+      4: { title: "Enter Sandman", rating: { chords: 2, licks: 3, timing: 2 }, artist: "Metallica", year: 1991, bpm: 123, key: "E minor", coming: true, backing: STUB },
       5: {
-        title: "More Than Words", artist: "Extreme", year: 1990, bpm: 97, key: "G major",
+        title: "More Than Words", rating: { chords: 3, licks: 2, timing: 3 }, artist: "Extreme", year: 1990, bpm: 97, key: "G major",
         backing: { kick: [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], snare: [1,0,0,0, 1,0,0,1, 0,1,0,0, 1,1,1,1] },
         warmup: { videoId: "4SIqf6ktnYg", label: "Fingerpicking Exercise · YouTube", title: "Fingerpicking & Chord Melody", meta: "More Than Words blends chords and melody in the same hand · focus on clean individual note separation" },
         lesson: { videoId: "T0XzFYChv18", label: "Marty Music · YouTube" },
@@ -658,7 +660,7 @@ const TRACKS = {
         ]}
       },
       6: {
-        title: "Money for Nothing", artist: "Dire Straits", year: 1985, bpm: 136, key: "G minor",
+        title: "Money for Nothing", rating: { chords: 2, licks: 4, timing: 2 }, artist: "Dire Straits", year: 1985, bpm: 136, key: "G minor",
         backing: { kick: [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], snare: [1,0,0,0, 1,0,0,1, 0,1,0,0, 1,1,1,1] },
         warmup: { videoId: "YU0uHsobGmg", label: "Blues Scale Exercises · YouTube", title: "Blues Scale", meta: "Minor pentatonic + the flat 5 blue note · the exact scale behind this riff" },
         lesson: { videoId: "uIwzFBCPVso", label: "Marty Music · YouTube" },
@@ -671,10 +673,10 @@ const TRACKS = {
           { label: "Verse",  prog: ["Gm","Bb","C"] },
         ]}
       },
-      7: { title: "Nothing Else Matters", artist: "Metallica", year: 1991, bpm: 69, key: "E minor", coming: true, backing: STUB },
-      8: { title: "Paradise City", artist: "Guns N' Roses", year: 1987, bpm: 100, key: "G major", coming: true, backing: STUB },
+      7: { title: "Nothing Else Matters", rating: { chords: 2, licks: 3, timing: 3 }, artist: "Metallica", year: 1991, bpm: 69, key: "E minor", coming: true, backing: STUB },
+      8: { title: "Paradise City", rating: { chords: 2, licks: 3, timing: 3 }, artist: "Guns N' Roses", year: 1987, bpm: 100, key: "G major", coming: true, backing: STUB },
       9: {
-        title: "Message in a Bottle", artist: "The Police", year: 1979, bpm: 150, key: "C# minor",
+        title: "Message in a Bottle", rating: { chords: 3, licks: 2, timing: 3 }, artist: "The Police", year: 1979, bpm: 150, key: "C# minor",
         backing: { kick: [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], snare: [1,0,0,0, 1,0,0,1, 0,1,0,0, 1,1,1,1] },
         warmup: { videoId: "GYwdxHH9Y_k", label: "Arpeggio Exercises · YouTube", title: "Arpeggio Picking", meta: "Root → 5th → 9th on every chord at 150 BPM · get that picking hand precise before you start" },
         lesson: { videoId: "kZ-BVTKUVJM", label: "Marty Music · YouTube" },
@@ -687,7 +689,7 @@ const TRACKS = {
         ]}
       },
       10: {
-        title: "Tears in Heaven", artist: "Eric Clapton", year: 1992, bpm: 80, key: "A major",
+        title: "Tears in Heaven", rating: { chords: 3, licks: 3, timing: 3 }, artist: "Eric Clapton", year: 1992, bpm: 80, key: "A major",
         backing: { kick: [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], snare: [1,0,0,0, 1,0,0,1, 0,1,0,0, 1,1,1,1] },
         warmup: { videoId: "4SIqf6ktnYg", label: "Fingerpicking Exercise · YouTube", title: "Travis Picking", meta: "Tears in Heaven uses Travis-style alternating bass fingerpicking · slow it down and isolate the pattern" },
         lesson: { videoId: "iS9kWyI1dxw", label: "Marty Music · YouTube" },
@@ -706,13 +708,13 @@ const TRACKS = {
   advanced: {
     label: 'Advanced',
     sessions: {
-      1: { title: "Layla", artist: "Eric Clapton", year: 1970, bpm: 92, key: "D minor", coming: true, backing: STUB },
-      2: { title: "Sweet Child O' Mine", artist: "Guns N' Roses", year: 1987, bpm: 125, key: "D major", coming: true, backing: STUB },
-      3: { title: "Crazy Train", artist: "Ozzy Osbourne", year: 1980, bpm: 138, key: "A minor", coming: true, backing: STUB },
-      4: { title: "November Rain", artist: "Guns N' Roses", year: 1991, bpm: 74, key: "G major", coming: true, backing: STUB },
-      5: { title: "Purple Rain", artist: "Prince", year: 1984, bpm: 113, key: "Bb major", coming: true, backing: STUB },
+      1: { title: "Layla", rating: { chords: 3, licks: 4, timing: 2 }, artist: "Eric Clapton", year: 1970, bpm: 92, key: "D minor", coming: true, backing: STUB },
+      2: { title: "Sweet Child O' Mine", rating: { chords: 2, licks: 5, timing: 2 }, artist: "Guns N' Roses", year: 1987, bpm: 125, key: "D major", coming: true, backing: STUB },
+      3: { title: "Crazy Train", rating: { chords: 3, licks: 4, timing: 2 }, artist: "Ozzy Osbourne", year: 1980, bpm: 138, key: "A minor", coming: true, backing: STUB },
+      4: { title: "November Rain", rating: { chords: 3, licks: 4, timing: 3 }, artist: "Guns N' Roses", year: 1991, bpm: 74, key: "G major", coming: true, backing: STUB },
+      5: { title: "Purple Rain", rating: { chords: 3, licks: 4, timing: 3 }, artist: "Prince", year: 1984, bpm: 113, key: "Bb major", coming: true, backing: STUB },
       6: {
-        title: "Hotel California", artist: "Eagles", year: 1977, bpm: 75, key: "B minor",
+        title: "Hotel California", rating: { chords: 3, licks: 4, timing: 3 }, artist: "Eagles", year: 1977, bpm: 75, key: "B minor",
         backing: { kick: [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], snare: [1,0,0,0, 1,0,0,1, 0,1,0,0, 1,1,1,1] },
         warmup: { videoId: "GYwdxHH9Y_k", label: "Arpeggio Exercises · YouTube", title: "Arpeggio Patterns", meta: "The intro is a beautiful Bm arpeggio descent · warm up slow picking patterns before tackling it" },
         lesson: { videoId: "JIDdI-AtK-Q", label: "Marty Music · YouTube" },
@@ -725,10 +727,10 @@ const TRACKS = {
           { label: "Chorus", prog: ["G","D","F#","Bm"] },
         ]}
       },
-      7: { title: "Blackbird", artist: "The Beatles", year: 1968, bpm: 96, key: "G major", coming: true, backing: STUB },
-      8: { title: "Comfortably Numb", artist: "Pink Floyd", year: 1979, bpm: 63, key: "Bb major", coming: true, backing: STUB },
-      9: { title: "Sultans of Swing", artist: "Dire Straits", year: 1978, bpm: 149, key: "D minor", coming: true, backing: STUB },
-      10: { title: "Stairway to Heaven", artist: "Led Zeppelin", year: 1971, bpm: 72, key: "A minor", coming: true, backing: STUB },
+      7: { title: "Blackbird", rating: { chords: 3, licks: 3, timing: 4 }, artist: "The Beatles", year: 1968, bpm: 96, key: "G major", coming: true, backing: STUB },
+      8: { title: "Comfortably Numb", rating: { chords: 3, licks: 5, timing: 3 }, artist: "Pink Floyd", year: 1979, bpm: 63, key: "Bb major", coming: true, backing: STUB },
+      9: { title: "Sultans of Swing", rating: { chords: 3, licks: 5, timing: 3 }, artist: "Dire Straits", year: 1978, bpm: 149, key: "D minor", coming: true, backing: STUB },
+      10: { title: "Stairway to Heaven", rating: { chords: 3, licks: 4, timing: 4 }, artist: "Led Zeppelin", year: 1971, bpm: 72, key: "A minor", coming: true, backing: STUB },
     }
   }
 };
@@ -826,11 +828,31 @@ function setInstrument(key) {
   if (!s.coming) renderChordSection(s);
 }
 
+// Barre chords gained (or lost) when the song's shapes are transposed for the instrument
+function barreDelta(s) {
+  const c = s.chords; if (!c) return 0;
+  const arr = c.sections ? Object.values(c.sections).flatMap(x => x.bars.flat())
+            : c.grid ? c.grid.flatMap(x => x.bars.flat()) : c.structure.flatMap(r => r.prog);
+  const unique = [...new Set(arr.filter(Boolean))];
+  const barres = names => names.filter(n => CHORD_SHAPES[n] && CHORD_SHAPES[n].barre).length;
+  return barres(unique.map(tx)) - barres(unique);
+}
+
+// songs.md rating (Chords / Licks / Timing, 1–5), with Chords adjusted for the instrument
+function difficultyFor(s) {
+  const r = s.rating; if (!r) return null;
+  const chords = Math.min(5, Math.max(1, r.chords + barreDelta(s)));
+  return (chords + r.licks + r.timing) / 3;
+}
+
 function renderInstrumentInfo(s) {
   const gl = instrument === 'guitarlele';
-  const shapesEl = document.getElementById('hShapes');
-  shapesEl.style.display = gl ? '' : 'none';
-  if (gl) document.getElementById('hShapesVal').textContent = keyForInstrument(s.key);
+  document.getElementById('hKeyLabel').textContent = gl ? 'Shapes' : 'Key';
+  document.getElementById('hKey').textContent = gl ? keyForInstrument(s.key) : s.key;
+  const d = difficultyFor(s);
+  document.getElementById('hDiff').textContent = d === null ? '–' : d.toFixed(1);
+  const filled = d === null ? 0 : Math.round(d);
+  document.getElementById('hDiffDots').innerHTML = [1,2,3,4,5].map(i => i <= filled ? '●' : '<span class="off">●</span>').join('');
   document.getElementById('chordsMeta').innerHTML = gl
     ? 'Guitarlele: shapes shown a 4th lower than the guitar lesson, so they sound in the original key · play through each section using the pattern above'
     : 'Learn the shapes · play through each section using the pattern above';
@@ -1121,7 +1143,6 @@ function renderSession(s) {
   document.getElementById('hTitle').textContent  = s.title;
   document.getElementById('hArtist').textContent = s.artist + ' · ' + s.year;
   document.getElementById('hBpm').textContent    = s.bpm;
-  document.getElementById('hKey').textContent    = s.key;
   document.getElementById('btBpm').value         = s.bpm;
   document.getElementById('btBpmVal').textContent = s.bpm;
   renderInstrumentInfo(s);

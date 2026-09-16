@@ -14,6 +14,9 @@ Decisions that constrain new code, corrections received, gotchas. Rewritten as s
 
 - Guitarlele is A D G C E A: a guitar capo'd at the 5th fret. Same shapes, sounding a 4th higher. In guitarlele mode `chordsForInstrument()` transposes every chord name by `INSTRUMENTS.guitarlele.offset` (-5) before rendering; the header shows `Guitarlele shapes: <key>` via `keyForInstrument()`.
 - `transposeChord()` parses root / suffix / slash bass and spells the result with whichever of default, sharp, flat exists in `CHORD_SHAPES`. Minor keys spell to match the `m` chord (C# minor → G# minor, not Ab).
+- Header shows one key chip, labelled `Key` (guitar) or `Shapes` (guitarlele). **Carlos's correction:** showing both Key and Guitarlele shapes side by side was rejected.
+- `rating: { chords, licks, timing }` on every session comes from songs.md. `difficultyFor()` averages them with Chords shifted by `barreDelta()` (barre chords gained or lost after transposition, clamped 1–5). Stubs have no chord data, so their guitarlele difficulty equals the guitar one.
+- **Carlos's decision:** week order stays the same on both instruments; difficulty is displayed, not used to re-sort. A per-instrument order was proposed and declined.
 - **Carlos's decision:** the player is untouched. Pitch-shifting the track (+5) was offered and rejected because the pitch slider already exists.
 
 ## Corrections and preferences

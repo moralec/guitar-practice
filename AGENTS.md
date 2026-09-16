@@ -14,7 +14,7 @@ Three tracks (Beginner, Intermediate, Advanced) × 10 weeks. Each built week has
 4. **Chords** — SVG diagrams from `CHORD_SHAPES`, one per unique chord
 5. **Play Along** — Web Audio A-B loop player (speed + pitch shift) → song map below
 
-Header toggle **Guitar / Guitarlele** transposes steps 4 and 5 a 4th down (see `MEMORY.md`).
+Header toggle **Guitar / Guitarlele** transposes steps 4 and 5 a 4th down (see `MEMORY.md`). The header shows BPM, Difficulty (songs.md score, Chords adjusted for the instrument) and one key chip: `Key` on guitar, `Shapes` on guitarlele.
 
 ## Adding or building a week
 
@@ -22,7 +22,8 @@ Edit the session object under `TRACKS.<track>.sessions[<week>]` in `index.html`.
 
 ```javascript
 1: {
-  title: "Song", artist: "Artist", year: 1988, bpm: 88, key: "G major", defaultPitch: 0,
+  title: "Song", rating: { chords: 1, licks: 2, timing: 1 },   // from songs.md, 1–5 each
+  artist: "Artist", year: 1988, bpm: 88, key: "G major", defaultPitch: 0,
   backing: { kick: [16 × 0|1], snare: [16 × 0..1] },   // fractional snare = ghost note opacity
   warmup: { videoId, label, title, meta },
   lesson: { videoId, label },

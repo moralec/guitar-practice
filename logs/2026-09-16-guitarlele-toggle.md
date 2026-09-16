@@ -12,7 +12,12 @@ Carlos got a guitarlele and wants the app to work for it. Later in the session: 
 - `MEMORY.md`, `BACKLOG.md`, `logs/INDEX.md` — created.
 - Message appended to the Palace's `INBOX.md` asking for the registry row to be completed.
 
+- `index.html` — `rating` on all 30 sessions from songs.md; header now `BPM · Difficulty x.x ●●○○○ · Key|Shapes`; `barreDelta()`, `difficultyFor()`. The separate "Guitarlele shapes" chip is gone.
+
 ## Decisions
+
+- Keep one week order for both instruments and show a difficulty rating instead. Difficulty = songs.md average with Chords shifted by the barre delta; stubs are unadjusted because they have no chord data.
+- One key chip: `Key G major` on guitar, `Shapes D major` on guitarlele.
 
 - Transpose the displayed shapes a 4th down (option 1) rather than pitch-shift the track (+5) or add a guitarlele track. Reason: correct audio, and the pitch slider already exists for anyone who prefers option 2.
 - Chord spelling follows whatever exists in `CHORD_SHAPES`; minor keys spell to the `m` chord (C# minor → G# minor).
@@ -21,6 +26,9 @@ Carlos got a guitarlele and wants the app to work for it. Later in the session: 
 
 ## Corrections
 
+- "Maybe we leave it as it. Easier to have a difficulty rating and display that" — reorder by instrument declined.
+- "I do not like to have Key and giralele shapes. Lets rethink those KPIs" — the two chips were replaced by one that follows the instrument.
+
 - "Option 1 is best. The change of what we hear we already have in the player. Lets leave that untouched."
 - "I am not seeing anything changing in the live app" — cause was a stale tab; a hard reload fixed it. Netlify headers and served content were correct.
 - Palace membership question was asked twice before Carlos answered: "lets make it parte of memory palace."
@@ -28,6 +36,7 @@ Carlos got a guitarlele and wants the app to work for it. Later in the session: 
 ## Verification
 
 - Node: every chord used across all sessions (24 library chords) transposes to an existing shape.
+- Difficulty/key chip: headless Chrome DOM dump for guitar mode, node run of the same functions for guitarlele (the Chrome extension had disconnected).
 - Browser via Chrome extension on `http://127.0.0.1:7432` (`file://` is refused by the extension): toggle renders, all 10 built sessions show one diagram per transposed chord, setting survives reload, coming-soon weeks do not throw, switching back restores original shapes. Repeated on the live site after deploy.
 
 ## Open
