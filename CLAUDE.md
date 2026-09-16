@@ -64,3 +64,7 @@ YouTube thumbnails load from `img.youtube.com` — no server needed.
 - `index.html` — the whole app (HTML + CSS + JS, self-contained)
 - `Practice.command` — double-click to start a local server on port 7432 (only needed if YouTube embeds are required in future)
 - `mockup-a/b/c.html` — original layout mockups, not used
+
+## Instrument toggle (Guitar / Guitarlele)
+
+A guitarlele is tuned A D G C E A (a guitar capo'd at the 5th fret): same shapes, sounding a 4th higher. The header toggle stores `guitarInstrument` in localStorage. In guitarlele mode `chordsForInstrument()` transposes every chord name down 5 semitones before rendering, so diagrams and the song map show shapes that sound in the original key. The header shows the transposed key as "Guitarlele shapes". The play-along player is untouched. Every chord in `CHORD_SHAPES` needs a counterpart a 4th down (e.g. adding `Cadd9` means adding `Gadd9`); `transposeChord()` picks the sharp/flat spelling that exists in the library.

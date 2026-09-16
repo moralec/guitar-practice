@@ -26,6 +26,19 @@
   .track-btn:hover { color: #aaa; }
   .track-btn.active { background: #f5a623; color: #000; }
 
+  /* Instrument toggle */
+  .instrument-row { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .instrument-row .instrument-label { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: #444; }
+  .instrument-toggle { display: inline-flex; gap: 2px; background: #141414; border: 1px solid #1e1e1e; border-radius: 8px; padding: 3px; }
+  .instrument-btn {
+    background: transparent; border: none; border-radius: 6px;
+    color: #555; font-size: 12px; font-weight: 600; padding: 6px 12px;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .instrument-btn:hover { color: #aaa; }
+  .instrument-btn.active { background: #2a2a2a; color: #f5a623; }
+  .shapes-note { color: #f5a623; }
+
   /* Week selector */
   .week-selector {
     display: flex; gap: 8px; margin-bottom: 40px; flex-wrap: wrap;
@@ -249,6 +262,12 @@
 </head>
 <body>
 
+<!-- ── Instrument toggle ── -->
+<div class="instrument-row">
+  <span class="instrument-label">Instrument</span>
+  <div class="instrument-toggle" id="instrumentToggle"></div>
+</div>
+
 <!-- ── Track selector ── -->
 <div class="track-selector" id="trackSelector"></div>
 
@@ -263,6 +282,7 @@
   <div class="song-meta">
     <span><strong id="hBpm"></strong> BPM</span>
     <span>Key: <strong id="hKey"></strong></span>
+    <span id="hShapes" style="display:none">Guitarlele shapes: <strong id="hShapesVal"></strong></span>
   </div>
 </header>
 
@@ -334,7 +354,7 @@
     <div class="step-body">
       <div class="step-label">Chords · 5 min</div>
       <div class="step-title">Chords</div>
-      <div class="step-meta">Learn the shapes · play through each section using the pattern above</div>
+      <div class="step-meta" id="chordsMeta">Learn the shapes · play through each section using the pattern above</div>
       <div class="card">
         <div id="chordDiagrams"></div>
       </div>
@@ -434,6 +454,15 @@ const CHORD_SHAPES = {
   "Eb":    { frets: [-1,6,8,8,8,6], barre: 6 },
   "Bb":    { frets: [-1,1,3,3,3,1], barre: 1 },
   "Gm":    { frets: [3,5,5,3,3,3],  barre: 3 },
+  // Guitarlele counterparts (each library chord a 4th down)
+  "Dm":    { frets: [-1,-1,0,2,3,1] },
+  "Bm7":   { frets: [-1,2,0,2,0,2] },
+  "Gadd9": { frets: [3,2,0,2,0,3] },
+  "Asus4": { frets: [-1,0,2,2,3,0] },
+  "A/C#":  { frets: [-1,4,2,2,2,0] },
+  "F#7":   { frets: [2,4,2,3,2,2],  barre: 2 },
+  "C#":    { frets: [-1,4,6,6,6,4], barre: 4 },
+  "G#m":   { frets: [4,6,6,4,4,4],  barre: 4 },
 };
 
 // ── Session data ───────────────────────────────────────
@@ -713,6 +742,100 @@ if (!TRACKS[currentTrack].sessions[currentWeek]) currentWeek = 1;
 
 function currentSession() { return TRACKS[currentTrack].sessions[currentWeek]; }
 
+// ── Instrument (guitar / guitarlele) ───────────────────
+// A guitarlele is tuned A D G C E A: a guitar capo'd at the 5th fret. Same shapes,
+// sounding a 4th higher. To match the record we show every chord a 4th lower.
+const INSTRUMENTS = { guitar: { label: '🎸 Guitar', offset: 0 }, guitarlele: { label: '🪕 Guitarlele', offset: -5 } };
+let instrument = localStorage.getItem('guitarInstrument');
+if (!INSTRUMENTS[instrument]) instrument = 'guitar';
+
+const NOTE_IDX = { C:0,'C#':1,Db:1,D:2,'D#':3,Eb:3,E:4,'E#':5,F:5,'F#':6,Gb:6,G:7,'G#':8,Ab:8,A:9,'A#':10,Bb:10,B:11,Cb:11 };
+const NOTE_SHARP   = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const NOTE_FLAT    = ['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','B'];
+const NOTE_DEFAULT = ['C','C#','D','Eb','E','F','F#','G','Ab','A','Bb','B'];
+
+// Spell a transposed root so that it matches a shape in CHORD_SHAPES when one exists
+function spellRoot(pc, suffix, bassPart) {
+  const cands = [NOTE_DEFAULT[pc], NOTE_SHARP[pc], NOTE_FLAT[pc]];
+  return cands.find(r => CHORD_SHAPES[r + suffix + bassPart]) || NOTE_DEFAULT[pc];
+}
+
+function transposeChord(name, semis) {
+  if (!name || !semis) return name;
+  const m = name.match(/^([A-G][#b]?)([^\/]*)(?:\/([A-G][#b]?))?$/);
+  if (!m) return name;
+  const [, root, suffix, bass] = m;
+  const pc = (NOTE_IDX[root] + semis + 120) % 12;
+  if (!bass) return spellRoot(pc, suffix, '') + suffix;
+  const bpc = (NOTE_IDX[bass] + semis + 120) % 12;
+  const bassName = NOTE_DEFAULT[bpc];
+  const r = spellRoot(pc, suffix, '/' + bassName);
+  // If the root spelling needed a different bass spelling, try sharp/flat for the bass too
+  const full = r + suffix + '/' + bassName;
+  if (CHORD_SHAPES[full]) return full;
+  const alt = [NOTE_SHARP[bpc], NOTE_FLAT[bpc]].map(b => r + suffix + '/' + b).find(n => CHORD_SHAPES[n]);
+  return alt || full;
+}
+
+function tx(name) { return transposeChord(name, INSTRUMENTS[instrument].offset); }
+
+// Return a copy of a session's chord data with every chord name transposed for the instrument
+function chordsForInstrument(data) {
+  if (!data || !INSTRUMENTS[instrument].offset) return data;
+  const mapBars = bars => bars.map(bar => bar.map(tx));
+  if (data.sections) {
+    const sections = {};
+    Object.entries(data.sections).forEach(([k, sec]) => { sections[k] = { ...sec, bars: mapBars(sec.bars) }; });
+    return { ...data, sections };
+  }
+  if (data.grid) return { ...data, grid: data.grid.map(sec => ({ ...sec, bars: mapBars(sec.bars) })) };
+  if (data.structure) return { ...data, structure: data.structure.map(row => ({ ...row, prog: row.prog.map(tx) })) };
+  return data;
+}
+
+// Key string like "G major" → "D major" for the instrument
+function keyForInstrument(key) {
+  const m = (key || '').match(/^([A-G][#b]?)(.*)$/);
+  if (!m) return key;
+  const off = INSTRUMENTS[instrument].offset;
+  const pc = (NOTE_IDX[m[1]] + off + 120) % 12;
+  const minor = /minor|\bm\b/i.test(m[2]);
+  return spellRoot(pc, minor ? "m" : "", "") + m[2];
+}
+
+function buildInstrumentToggle() {
+  const el = document.getElementById('instrumentToggle');
+  el.innerHTML = '';
+  Object.keys(INSTRUMENTS).forEach(key => {
+    const btn = document.createElement('button');
+    btn.className = 'instrument-btn' + (key === instrument ? ' active' : '');
+    btn.dataset.instrument = key;
+    btn.textContent = INSTRUMENTS[key].label;
+    btn.onclick = () => setInstrument(key);
+    el.appendChild(btn);
+  });
+}
+
+function setInstrument(key) {
+  if (!INSTRUMENTS[key] || key === instrument) return;
+  instrument = key;
+  localStorage.setItem('guitarInstrument', key);
+  document.querySelectorAll('.instrument-btn').forEach(b => b.classList.toggle('active', b.dataset.instrument === key));
+  const s = currentSession();
+  renderInstrumentInfo(s);
+  if (!s.coming) renderChordSection(s);
+}
+
+function renderInstrumentInfo(s) {
+  const gl = instrument === 'guitarlele';
+  const shapesEl = document.getElementById('hShapes');
+  shapesEl.style.display = gl ? '' : 'none';
+  if (gl) document.getElementById('hShapesVal').textContent = keyForInstrument(s.key);
+  document.getElementById('chordsMeta').innerHTML = gl
+    ? 'Guitarlele: shapes shown a 4th lower than the guitar lesson, so they sound in the original key · play through each section using the pattern above'
+    : 'Learn the shapes · play through each section using the pattern above';
+}
+
 // ── Track selector ─────────────────────────────────────
 function buildTrackSelector() {
   const sel = document.getElementById('trackSelector');
@@ -892,7 +1015,7 @@ function renderChordSection(s) {
   const gridEl = document.getElementById('chordGrid');
 
   if (!s.chords) { diagEl.innerHTML = ''; gridEl.innerHTML = ''; return; }
-  const data = s.chords;
+  const data = chordsForInstrument(s.chords);
 
   // ── New format: sections + sequence ──
   if (data.sections && data.sequence) {
@@ -1001,6 +1124,7 @@ function renderSession(s) {
   document.getElementById('hKey').textContent    = s.key;
   document.getElementById('btBpm').value         = s.bpm;
   document.getElementById('btBpmVal').textContent = s.bpm;
+  renderInstrumentInfo(s);
 
   const coming = !!s.coming;
   document.getElementById('stepsSection').style.display = coming ? 'none' : '';
@@ -1448,6 +1572,7 @@ function renderBtGrid() {
 }
 
 // ── Init ───────────────────────────────────────────────
+buildInstrumentToggle();
 buildTrackSelector();
 buildWeekSelector();
 renderSession(currentSession());
