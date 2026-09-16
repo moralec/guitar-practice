@@ -21,7 +21,7 @@ Carlos got a guitarlele and wants the app to work for it. Later in the session: 
 
 - Transpose the displayed shapes a 4th down (option 1) rather than pitch-shift the track (+5) or add a guitarlele track. Reason: correct audio, and the pitch slider already exists for anyone who prefers option 2.
 - Chord spelling follows whatever exists in `CHORD_SHAPES`; minor keys spell to the `m` chord (C# minor → G# minor).
-- Archetype `local-tool`, matching the registry row that already existed, despite the public deploy. Flagged in `BACKLOG.md` for the operator.
+- Archetype `local-tool` at adopt time, matching the existing registry row. **Reversed at 14:35 by the operator:** `.palace` and the Palace registry now say `dashboard-app`; the brief resolves that tier. The layout restructure that tier requires is in `BACKLOG.md`, recorded as a deviation in `MEMORY.md`.
 - Logs are committed and pushed, so they deploy with the site. Accepted for now; exclusion is in the backlog.
 
 ## Corrections
@@ -41,5 +41,6 @@ Carlos got a guitarlele and wants the app to work for it. Later in the session: 
 
 ## Open
 
-- Palace registry row still says domain `null`; the inbox message asks for `personal`.
+- Registry row now reads `dashboard-app · personal`; the inbox request is satisfied.
+- `dashboard-app` layout and `docs/readme.html` (needs the AG Insights template from Carlos) are not done; top of `BACKLOG.md`.
 - See `BACKLOG.md`: archetype confirmation, Netlify publish exclusions, silent-missing-diagram warning, pending `songs.md` edit.

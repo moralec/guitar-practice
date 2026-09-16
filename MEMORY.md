@@ -26,6 +26,11 @@ Decisions that constrain new code, corrections received, gotchas. Rewritten as s
 - Marty Music is the preferred lesson source.
 - Carlos wants a clear data format to fill in (chord bars, backing patterns) rather than prose instructions.
 
+## Palace archetype: dashboard-app (since 2026-09-16 14:35)
+
+- Adopted as `local-tool`; Carlos changed `.palace` and the registry to `dashboard-app` the same afternoon. The public Netlify deploy is the reason.
+- **Documented deviation:** the tree is still flat (`index.html` at root, no `apps/`, no `docs/readme.html`, mockups at root). The restructure is the top of `BACKLOG.md`, not done yet, so `dashboard-app-layout` audits will flag it until then. The front door is `AGENTS.md` until the AG Insights readme template is supplied.
+
 ## Gotchas
 
 - `logs/` and every committed file are deployed by Netlify — the repo root is the publish directory.
